@@ -1,10 +1,10 @@
-// Below we will use the Express Router to define a read only API endpoint
+// Below we will use the Express Router to define a series of API endpoints.
 // Express will listen for API requests and respond accordingly
 import express from 'express'
 const router = express.Router()
 
 // Set this to match the model name in your Prisma schema
-const model = 'items'
+const model = 'tickets'
 
 // Prisma lets NodeJS communicate with MongoDB
 // Let's import and initialize the Prisma client
@@ -12,22 +12,47 @@ const model = 'items'
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
+// Connect to the database
+prisma.$connect().then(() => {
+    console.log('Prisma connected to MongoDB')
+}).catch(err => {
+    console.error('Failed to connect to MongoDB:', err)
+})
 
-// ----- basic findMany() -------
-// This endpoint uses the Prisma schema defined in /prisma/schema.prisma
-// This gives us a cleaner data structure to work with. 
+// ----- CREATE (POST) -----
+// Create a new record for the configured model
+// This is the 'C' of CRUD
+router.post('/data', async (req, res) => {
+    try {
+        // Remove the id field from request body if it exists
+        // MongoDB will auto-generate an ID for new records
+        const { id, ...createData } = req.body
+
+        const created = await prisma[model].create({
+            data: createData
+        })
+        res.status(201).send(created)
+    } catch (err) {
+        console.error('POST /data error:', err)
+        res.status(500).send({ error: 'Failed to create record', details: err.message || err })
+    }
+})
+
+
+// ----- READ (GET) list ----- 
 router.get('/data', async (req, res) => {
     try {
-        // fetch first 10 records from the database with no filter
+        // fetch first 100 records from the database with no filter
         const result = await prisma[model].findMany({
-            take: 10
+            take: 100
         })
         res.send(result)
     } catch (err) {
-        console.log(err)
-        res.status(500).send(err)
+        console.error('GET /data error:', err)
+        res.status(500).send({ error: 'Failed to fetch records', details: err.message || err })
     }
 })
+
 
 
 // ----- findMany() with search ------- 
@@ -40,7 +65,7 @@ router.get('/search', async (req, res) => {
         // fetch the records from the database
         const result = await prisma[model].findMany({
             where: {
-                name: {
+                concertName: {
                     contains: searchTerms,
                     mode: 'insensitive'  // case-insensitive search
                 }
@@ -50,26 +75,48 @@ router.get('/search', async (req, res) => {
         })
         res.send(result)
     } catch (err) {
-        console.log(err)
-        res.status(500).send(err)
+        console.error('GET /search error:', err)
+        res.status(500).send({ error: 'Search failed', details: err.message || err })
     }
 })
 
 
-// ----- findRaw() -------
-// Returning Raw records from MongoDB
-// This endpoint does not use any schema. 
-// This is can be useful for testing and debugging.
-router.get('/raw', async (req, res) => {
+// ----- UPDATE (PUT) -----
+// Listen for PUT requests
+// respond by updating a particular record in the database
+// This is the 'U' of CRUD
+// After updating the database we send the updated record back to the frontend.
+router.put('/data/:id', async (req, res) => {
     try {
-        // raw queries use native MongoDB query syntax
-        // e.g. "limit" instead of "take"
-        const options = { limit: 10 };
-        const results = await prisma[model].findRaw({ options });
-        res.send(results);
+        // Remove the id from the request body if it exists
+        // The id should not be in the data payload for updates
+        const { id, ...updateData } = req.body
+
+        // Prisma update returns the updated version by default
+        const updated = await prisma[model].update({
+            where: { id: req.params.id },
+            data: updateData
+        })
+        res.send(updated)
     } catch (err) {
-        console.log(err)
-        res.status(500).send(err)
+        console.error('PUT /data/:id error:', err)
+        res.status(500).send({ error: 'Failed to update record', details: err.message || err })
+    }
+})
+
+// ----- DELETE -----
+// Listen for DELETE requests
+// respond by deleting a particular record in the database
+// This is the 'D' of CRUD
+router.delete('/data/:id', async (req, res) => {
+    try {
+        const result = await prisma[model].delete({
+            where: { id: req.params.id }
+        })
+        res.send(result)
+    } catch (err) {
+        console.error('DELETE /data/:id error:', err)
+        res.status(500).send({ error: 'Failed to delete record', details: err.message || err })
     }
 })
 
