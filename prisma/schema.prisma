@@ -6,3 +6,21 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model tickets {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+
+  concertName   String?
+  artist        String?
+  venue         String?
+  city          String?
+
+  concertDate   DateTime? @db.Date
+
+  ticketType    String?
+  price         Float?
+  seatInfo      String?
+
+  notes         String?
+}
+
