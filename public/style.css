@@ -1,3 +1,449 @@
+/* =============================
+   GLOBAL + RESET
+============================= */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 body {
-    font-family:Arial, Helvetica, sans-serif;
+  font-family: "Jost", sans-serif;
+  background: #dff4fb;        /* page background */
+  color: #052023;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+
+/* =============================
+   HEADER BAR
+============================= */
+
+header { 
+  width: 100%; 
+  background: #7ea6bd; 
+  padding: 3rem 8rem; 
+  box-sizing: border-box; 
+  position: relative; 
+} 
+
+header h1 { 
+  margin: 0 0 0.5rem 0; 
+  font-size: 3.25rem; 
+  font-weight: 400; 
+  color: #051017; 
+  line-height: 1; 
+  text-align: left; 
+} 
+
+header p { 
+  margin: 0.5rem 0 0 0; 
+  color: rgba(5,16,23,0.9); 
+  max-width: 75rem; 
+  text-align: left; 
+}
+
+
+
+#createButton {
+  background: #e6f6ff;
+  color: #052023;
+  padding: 0.8rem 1.8rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.05);
+}
+
+#createButton:hover {
+  background: #f3fbff;
+}
+
+#createButton, .create-btn { 
+  position: absolute; 
+  right: 6rem; 
+  top: 2.25rem; 
+  padding: 0.7rem 1.6rem; 
+  background: #e6f6ff; 
+  color: #0b3d4a; 
+  border-radius: 999px; 
+  border: none; 
+  font-weight: 700; 
+  cursor: pointer; 
+  box-shadow: 0 4px 0 rgba(0,0,0,0.03); 
+}
+
+
+
+/* =============================
+   STATUS BANNER (MongoDB ready)
+============================= */
+
+#statusBar,
+#readyStatus,
+#notReadyStatus {
+  width: 100%;
+  padding: 1rem 6rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #052023;
+}
+
+#readyStatus {
+  background: #c4f3cf;
+}
+
+#notReadyStatus {
+  background: #ffdede;
+  color: #7e0000;
+}
+
+
+
+/* =============================
+   CONTENT AREA – 2 COLUMN GRID
+============================= */
+
+#contentArea {
+  width: calc(100% - 12rem);
+  margin: 3rem auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(360px, 1fr));
+  gap: 3rem 3rem;       /* spacing between cards */
+}
+
+
+
+/* =============================
+   TICKET CARDS
+   Text left (single flow), calendar pinned right
+============================= */
+
+.item-card {
+  background: #6ea7b6;
+  color: #ffffff;
+  border-radius: 1.5rem;
+  padding: 2.5rem 3rem;
+  padding-right: 9rem;          /* room for the calendar on the right */
+  border: 1px solid #cde4ed;
+  width: 100%;
+  position: relative;           /* anchor for absolute calendar */
+}
+
+/* All paragraphs inside the card: smaller gaps */
+.item-card p {
+  margin: 0.18rem 0;
+  font-size: 1rem;
+}
+
+
+/* 2. Bold the words "Ticket Type" and "Price" (labels only) */
+.item-card .stat span:first-child {
+  font-weight: 700;
+}
+
+/* Remove the entire Artist row in the left info column */
+.item-card .left p:first-child {
+  display: none;
+}
+
+
+
+/* Info block (left column text) */
+.item-card .info,
+.item-info {
+  text-align: left;
+}
+
+.item-card h3 {
+  font-size: 1.9rem;
+  margin: 0 0 0.3rem 0;
+  color: #ffffff;
+}
+
+/* Optional subtitle under title */
+.item-card .subtitle {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+/* If you have a dedicated .meta wrapper, just treat it as normal text */
+.item-card .meta {
+  /* no layout rules here – let it flow with the rest of the text */
+}
+
+/* Add larger spacing between Status and Notes */
+.item-card .description {
+  margin-top: 2rem;   /* adjust this number */
+}
+
+
+/* Add spacing between artist name and the info block */
+.item-card .microchip-info {
+  margin-bottom: 2rem;   /* adjust number to your preference */
+}
+
+
+
+
+
+/* =============================
+   CALENDAR WIDGET
+   Pinned to the right, vertically centered
+============================= */
+
+.item-card .calendar {
+  position: absolute;
+  right: 3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rem;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.7rem;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  background: #fff;
+  text-align: center;
+}
+
+/* In case calendar appears outside .item-card somehow, keep generic styling */
+.calendar img {
+  width: 1.3rem;
+  margin: 0.25rem auto;
+  display: block;
+}
+
+.calendar .month {
+  background: #e6f6ff;
+  color: #0b3d4a;
+  padding: 0.4rem 0;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.calendar .day {
+  background: #ffffff;
+  color: #0b3d4a;
+  font-size: 1.7rem;
+  font-weight: 700;
+  padding: 0.55rem 0;
+}
+
+.calendar .year {
+  background: #f3fbff;
+  color: #0b3d4a;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.35rem 0;
+}
+
+
+
+/* =============================
+   PAGE PADDING
+============================= */
+
+main, 
+.about-section, 
+#about, 
+.section-body {
+  padding-left: 8rem;
+  padding-right: 8rem;
+  box-sizing: border-box;
+}
+
+#intro {
+  padding-left: 8rem;
+  padding-right: 8rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  box-sizing: border-box;
+}
+
+
+
+/* =============================
+   EDIT + DELETE BUTTONS
+============================= */
+
+.item-actions {
+  margin-top: 1.75rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.edit-btn,
+.delete-btn {
+  border: none;
+  padding: 0.6rem 1.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.edit-btn {
+  background: #e6f6ff;
+  color: #052023;
+}
+
+.delete-btn {
+  background: #ffdfe0;
+  color: #052023;
+}
+
+.edit-btn:hover { background: #f3fbff; }
+.delete-btn:hover { background: #ffcbcd; }
+
+
+
+/* =============================
+   FORM PANEL
+============================= */
+
+.form-panel,
+#formPopover {
+  background: #7ea6bd;
+  color: #e6f6ff;
+  border-radius: 0.75rem;
+  padding: 3rem 3.5rem;
+  width: min(1100px, calc(100% - 8rem));
+  margin: 2rem auto;
+  box-shadow: 0 8px 30px rgba(10,30,40,0.12);
+}
+
+#formPopover::backdrop {
+  background: rgba(0,0,0,0.5);
+}
+
+#formPopover h2 {
+  margin: 0 0 1.5rem 0;
+  text-align: center;
+  font-size: 1.8rem;
+  color: #fff;
+}
+
+
+
+/* =============================
+   FORM LAYOUT – 4 COLUMN GRID
+============================= */
+
+#myForm {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.6rem;
+}
+
+#myForm fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+#myForm label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  color: #e6f6ff;
+}
+
+#myForm input,
+#myForm select,
+#myForm textarea {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: #e6f6ff;
+  color: #052023;
+}
+
+/* Notes fieldset spans entire popover width */
+#myForm fieldset:has(#notes) {
+  grid-column: 1 / -1;
+}
+
+/* Make the textarea tall like your layout */
+#myForm textarea {
+  min-height: 12rem;
+}
+
+/* =============================
+   FORM BUTTONS (SAVE + CANCEL)
+   — full width at the bottom
+============================= */
+
+#myForm fieldset:last-of-type {
+  grid-column: 1 / -1;           /* span all 4 columns */
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin-top: 1.8rem;
+}
+
+button.save,
+button.cancel {
+  background: #e6f6ff;
+  color: #052023;
+  border: none;
+  padding: 0.7rem 1.8rem;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+button.save:hover,
+button.cancel:hover {
+  background: #f3fbff;
+}
+
+
+
+
+
+/* =============================
+   RESPONSIVE
+============================= */
+
+@media (max-width: 900px) {
+  header {
+    padding: 2rem;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  #contentArea {
+    width: calc(100% - 3rem);
+    grid-template-columns: 1fr;
+  }
+
+  /* small screens: let calendar drop into normal flow */
+  .item-card {
+    padding-right: 3rem;
+  }
+
+  .item-card .calendar {
+    position: static;
+    transform: none;
+    margin-top: 1rem;
+  }
+
+  #myForm {
+    grid-template-columns: 1fr;
+  }
+
+  #formPopover {
+    width: calc(100% - 2rem);
+    padding: 1.5rem;
+  }
 }
