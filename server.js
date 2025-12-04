@@ -18,7 +18,7 @@ import apiRoutes from './routes/api.js'
 app.use('/', apiRoutes)
 
 
-const port = 3000
+const port = 3001
 app.listen(port, () => {
     console.log(`Express is live at http://localhost:${port}`)
 })
