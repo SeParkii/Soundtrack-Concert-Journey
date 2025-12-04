@@ -4,21 +4,19 @@
   "description": "API Endpoints for Publishing and Searching",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "setup": "npm install && npx prisma db pull --force && npx prisma generate",
-    "start": "node --watch --env-file=.env server.js",
-    "deploy": "npm ci && npx prisma generate",
-     "postinstall": "prisma generate"
+    "setup": "npm install",
+    "start": "node --watch --env-file=.environment server.js",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@prisma/client": "^6.16.3",
+    "@prisma/client": "^6.18.0",
     "express": "^5.1.0"
   },
   "devDependencies": {
-    "prisma": "^6.16.3"
+    "prisma": "^6.18.0"
   }
 }
