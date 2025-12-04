@@ -65,6 +65,7 @@ typings/
 
 # dotenv environment variables file
 .env
+.environment
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -88,3 +89,5 @@ typings/
 .dynamodb/ 
 
 /generated/prisma
+
+.vscode
