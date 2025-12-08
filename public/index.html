@@ -187,6 +187,41 @@
         ></textarea>
         <small class="validation">Notes must be at least 10 characters.</small>
       </fieldset>
+
+            <!-- 🔹 STEP 2 (OPTIONAL): ADD SONGS FROM DEEZER -->
+      <hr />
+      <h3>Step 2 (Optional): Add Songs from Deezer</h3>
+      <p class="small">
+        Search for songs by this concert’s artist and attach them to this event. 
+        You can skip this step if you don’t want to add songs.
+      </p>
+
+      <fieldset class="song-step">
+        <label for="songSearch">Search Songs</label>
+        <div class="song-search-row">
+          <input
+            type="text"
+            id="songSearch"
+            placeholder="Song title or keyword"
+            autocomplete="off"
+          />
+          <button
+            type="button"
+            id="songSearchButton"
+          >
+            Search
+          </button>
+        </div>
+        <small class="hint">
+          Tip: leave the box empty to search by artist only.
+        </small>
+
+        <div id="songResults"></div>
+
+        <h4>Selected Songs for this Concert</h4>
+        <ul id="selectedSongsList"></ul>
+      </fieldset>
+
     
       <fieldset>
         <button
