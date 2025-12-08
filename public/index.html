@@ -64,147 +64,210 @@
     <p>Store details about a concert you’re going to or have attended.</p>
 
     <form id="myForm">
-      <!-- Hidden field to store ID for updates -->
-      <input
-        type="hidden"
-        name="id"
-        id="id"
-      />
-    
-      <fieldset>
-        <label for="concertName">Concert Name</label>
-        <input
-          required
-          type="text"
-          name="concertName"
-          id="concertName"
-          placeholder="e.g. The Starry Night Tour"
-          autocomplete="off"
-        />
-        <small class="validation">Concert name is required</small>
-      </fieldset>
-    
-      <fieldset>
-        <label for="artist">Artist</label>
-        <input
-          required
-          type="text"
-          name="artist"
-          id="artist"
-          placeholder="e.g. Taylor Swift"
-          autocomplete="off"
-        />
-        <small class="validation">Artist is required</small>
-      </fieldset>
-    
-      <fieldset>
-        <label for="venue">Venue</label>
-        <input
-          type="text"
-          name="venue"
-          id="venue"
-          placeholder="e.g. Scotiabank Arena"
-          autocomplete="off"
-        />
-      </fieldset>
-    
-      <fieldset>
-        <label for="city">City</label>
-        <input
-          type="text"
-          name="city"
-          id="city"
-          placeholder="e.g. Toronto, ON"
-          autocomplete="off"
-        />
-      </fieldset>
-    
-      <fieldset>
-        <label for="concertDate">Concert Date</label>
-        <input
-          type="date"
-          name="concertDate"
-          id="concertDate"
-        />
-      </fieldset>
-    
-      <fieldset>
-        <label for="ticketType">Ticket Type</label>
-        <select
-          name="ticketType"
-          id="ticketType"
-        >
-          <option
-            value=""
-            disabled
-            selected
-          >Select a ticket type</option>
-          
-            <option value="General Admission">General Admission</option>
-            <option value="VIP">VIP</option>
-            <option value="Resale">Resale</option>
-            <option value="Other">Other</option>
-         
-        </select>
-      </fieldset>
-    
-      <fieldset>
-        <label for="price">Ticket Price</label>
-        <input
-          type="number"
-          name="price"
-          id="price"
-          min="0"
-          step="0.01"
-          placeholder="e.g. 129.99"
-        />
-      </fieldset>
+  <!-- Hidden field to store ID for updates -->
+  <input
+    type="hidden"
+    name="id"
+    id="id"
+  />
 
-    
-      <fieldset>
-        <label for="seatInfo">Section / Row / Seat</label>
-        <input
-          type="text"
-          name="seatInfo"
-          id="seatInfo"
-          placeholder="e.g. Sec 112, Row F, Seat 8"
-          autocomplete="off"
-        />
-      </fieldset>
-    
-      <!-- 🔻 we removed Order Number, Platform, Attendance, Excitement Level -->
-    
-      <fieldset>
-        <label for="notes">Notes</label>
-        <small>Special memories, favorite songs, or other details.</small>
-        <textarea
-          placeholder="e.g. First time seeing them live, hoping they play my favourite song..."
-          name="notes"
-          id="notes"
-          rows="5"
-          cols="30"
-          minlength="10"
-        ></textarea>
-        <small class="validation">Notes must be at least 10 characters.</small>
-      </fieldset>
-    
-      <fieldset>
-        <button
-          class="save"
-          type="submit"
-        >
-          Save
-        </button>
-        <button
-          class="cancel"
-          type="button"
-          popovertarget="formPopover"
-          popovertargetaction="hide"
-        >
-          Cancel
-        </button>
-      </fieldset>
-    </form>    
+  <!-- STEP 1: Concert Info -->
+  <div id="step-1" class="form-step">
+    <fieldset>
+      <label for="concertName">Concert Name</label>
+      <input
+        required
+        type="text"
+        name="concertName"
+        id="concertName"
+        placeholder="e.g. The Starry Night Tour"
+        autocomplete="off"
+      />
+      <small class="validation">Concert name is required</small>
+    </fieldset>
+
+    <fieldset>
+      <label for="artist">Artist</label>
+      <input
+        required
+        type="text"
+        name="artist"
+        id="artist"
+        placeholder="e.g. Taylor Swift"
+        autocomplete="off"
+      />
+      <small class="validation">Artist is required</small>
+    </fieldset>
+
+    <fieldset>
+      <label for="venue">Venue</label>
+      <input
+        type="text"
+        name="venue"
+        id="venue"
+        placeholder="e.g. Scotiabank Arena"
+        autocomplete="off"
+      />
+    </fieldset>
+
+    <fieldset>
+      <label for="city">City</label>
+      <input
+        type="text"
+        name="city"
+        id="city"
+        placeholder="e.g. Toronto, ON"
+        autocomplete="off"
+      />
+    </fieldset>
+
+    <fieldset>
+      <label for="concertDate">Concert Date</label>
+      <input
+        type="date"
+        name="concertDate"
+        id="concertDate"
+      />
+    </fieldset>
+
+    <fieldset>
+      <label for="ticketType">Ticket Type</label>
+      <select
+        name="ticketType"
+        id="ticketType"
+      >
+        <option
+          value=""
+          disabled
+          selected
+        >Select a ticket type</option>
+        <option value="General Admission">General Admission</option>
+        <option value="VIP">VIP</option>
+        <option value="Resale">Resale</option>
+        <option value="Other">Other</option>
+      </select>
+    </fieldset>
+
+    <fieldset>
+      <label for="price">Ticket Price</label>
+      <input
+        type="number"
+        name="price"
+        id="price"
+        min="0"
+        step="0.01"
+        placeholder="e.g. 129.99"
+      />
+    </fieldset>
+
+    <fieldset>
+      <label for="seatInfo">Section / Row / Seat</label>
+      <input
+        type="text"
+        name="seatInfo"
+        id="seatInfo"
+        placeholder="e.g. Sec 112, Row F, Seat 8"
+        autocomplete="off"
+      />
+    </fieldset>
+
+    <fieldset>
+      <label for="notes">Notes</label>
+      <small>Special memories, favorite songs, or other details.</small>
+      <textarea
+        placeholder="e.g. First time seeing them live, hoping they play my favourite song..."
+        name="notes"
+        id="notes"
+        rows="5"
+        cols="30"
+        minlength="10"
+      ></textarea>
+      <small class="validation">Notes must be at least 10 characters.</small>
+    </fieldset>
+
+    <!-- Button to go to step 2 -->
+    <fieldset>
+      <button
+        type="button"
+        id="goToSongs"
+      >
+        Next: Add Songs (optional)
+      </button>
+
+      <button
+        class="cancel"
+        type="button"
+        popovertarget="formPopover"
+        popovertargetaction="hide"
+      >
+        Cancel
+      </button>
+    </fieldset>
+  </div>
+
+  <!-- STEP 2: Songs (optional) -->
+  <div id="step-2" class="form-step" hidden>
+    <h3>Step 2 (Optional): Add songs from this concert</h3>
+    <p>Search by artist or song title and attach songs you loved.</p>
+
+    <fieldset>
+      <label for="songQuery">Search songs</label>
+      <input
+        type="text"
+        id="songQuery"
+        placeholder="e.g. Taylor Swift, Love Story"
+        autocomplete="off"
+      />
+      <button
+        type="button"
+        id="songSearchButton"
+      >
+        Search
+      </button>
+      <small>Powered by Deezer API.</small>
+    </fieldset>
+
+    <section id="songResults"></section>
+
+    <h4>Selected Songs for this Concert</h4>
+    <section id="selectedSongsList"></section>
+
+    <fieldset>
+      <button
+        type="button"
+        id="backToInfo"
+      >
+        Back to Details
+      </button>
+
+      <!-- Skip just means "no songs", still saves the event -->
+      <button
+        type="button"
+        id="skipSongsButton"
+      >
+        Skip Songs & Save Event
+      </button>
+
+      <!-- Normal save with any selected songs -->
+      <button
+        class="save"
+        type="submit"
+      >
+        Save Event
+      </button>
+
+      <button
+        class="cancel"
+        type="button"
+        popovertarget="formPopover"
+        popovertargetaction="hide"
+      >
+        Cancel
+      </button>
+    </fieldset>
+  </div>
+</form>
+ 
   </div>
 
   <main>
