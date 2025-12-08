@@ -1,44 +1,45 @@
-let readyStatus = document.querySelector('#readyStatus')
-let notReadyStatus = document.querySelector('#notReadyStatus')
-let myForm = document.querySelector('#myForm')
-let contentArea = document.querySelector('#contentArea')
-let formPopover = document.querySelector('#formPopover')
-let createButton = document.querySelector('#createButton')
-let formHeading = document.querySelector('#formPopover h2')
+// ---------- BASIC DOM ELEMENTS ----------
+const readyStatus = document.querySelector('#readyStatus')
+const notReadyStatus = document.querySelector('#notReadyStatus')
+const myForm = document.querySelector('#myForm')
+const contentArea = document.querySelector('#contentArea')
+const formPopover = document.querySelector('#formPopover')
+const createButton = document.querySelector('#createButton')
+const formHeading = document.querySelector('#formPopover h2')
 
-// Step elements
+// Steps
 const step1 = document.querySelector('#step-1')
 const step2 = document.querySelector('#step-2')
 const goToSongsBtn = document.querySelector('#goToSongs')
 const backToInfoBtn = document.querySelector('#backToInfo')
 const skipSongsBtn = document.querySelector('#skipSongsButton')
 
-// Deezer song UI
+// Deezer search UI
 const songQueryInput = document.querySelector('#songQuery')
 const songSearchButton = document.querySelector('#songSearchButton')
 const songResultsContainer = document.querySelector('#songResults')
 const selectedSongsList = document.querySelector('#selectedSongsList')
 
-// Store selected songs in memory and send with the form
+// Keep selected songs in memory
 let selectedSongs = []
 
-// ---------- Helpers for steps ----------
+// ---------- STEP HELPERS ----------
 const showStep1 = () => {
-  step1.hidden = false
-  step2.hidden = true
+  if (step1) step1.hidden = false
+  if (step2) step2.hidden = true
 }
 
 const showStep2 = () => {
-  step1.hidden = true
-  step2.hidden = false
+  if (step1) step1.hidden = true
+  if (step2) step2.hidden = false
 }
 
-// ---------- Form data helper ----------
+// ---------- FORM DATA HELPER ----------
 const getFormData = () => {
   const formData = new FormData(myForm)
   const json = Object.fromEntries(formData)
 
-  // Handle checkboxes, dates, and numbers
+  // Handle special input types
   myForm.querySelectorAll('input').forEach(el => {
     const value = json[el.name]
     const isEmpty = !value || value.trim() === ''
@@ -52,22 +53,21 @@ const getFormData = () => {
     }
   })
 
-  // Attach selected songs to the payload
-  json.songs = selectedSongs
+  // Attach songs to payload
+  // json.songs = selectedSongs   // remove or comment this line
+
 
   return json
 }
 
-// ---------- Deezer search (via backend proxy) ----------
+// ---------- DEEZER: SEARCH + RENDER ----------
 const searchSongs = async (query) => {
   if (!query || !query.trim()) return
 
   songResultsContainer.innerHTML = '<p>Searching...</p>'
 
   try {
-    // IMPORTANT:
-    // This assumes you have a backend route /api/deezer-search
-    // that calls: https://api.deezer.com/search?q=${query}
+    // This calls your backend proxy route (must exist on server)
     const response = await fetch(`/api/deezer-search?q=${encodeURIComponent(query)}`)
 
     if (!response.ok) {
@@ -76,10 +76,11 @@ const searchSongs = async (query) => {
     }
 
     const data = await response.json()
-    renderSongResults(data.data || [])
+    const tracks = Array.isArray(data.data) ? data.data : []
+    renderSongResults(tracks)
   } catch (err) {
     console.error('Deezer search error:', err)
-    songResultsContainer.innerHTML = '<p><i>Error searching songs.</i></p>'
+    songResultsContainer.innerHTML = '<p><i>Song search failed.</i></p>'
   }
 }
 
@@ -90,34 +91,39 @@ const renderSongResults = (tracks) => {
   }
 
   const html = tracks.slice(0, 10).map(track => {
-    const inSelected = selectedSongs.some(s => s.id === track.id)
+    const isAlreadySelected = selectedSongs.some(s => s.id === track.id)
+
+    const trackData = {
+      id: track.id,
+      title: track.title,
+      artist: track.artist?.name || '',
+      album: track.album?.title || '',
+      cover: track.album?.cover_small || '',
+      preview: track.preview || ''
+    }
+
     return `
       <article class="song-card">
         <div class="song-main">
-          <img src="${track.album.cover_small}" alt="Album cover for ${track.album.title}">
+          ${trackData.cover
+            ? `<img src="${trackData.cover}" alt="Album cover for ${trackData.album}">`
+            : ''}
           <div>
-            <p class="song-title"><strong>${track.title}</strong></p>
-            <p class="song-artist">${track.artist.name}</p>
+            <p class="song-title"><strong>${trackData.title}</strong></p>
+            <p class="song-artist">${trackData.artist}</p>
           </div>
         </div>
         <div class="song-actions">
-          ${track.preview
-            ? `<audio controls src="${track.preview}"></audio>`
+          ${trackData.preview
+            ? `<audio controls src="${trackData.preview}"></audio>`
             : `<p><i>No preview available</i></p>`}
           <button
             type="button"
             class="add-song-btn"
-            data-track='${JSON.stringify({
-              id: track.id,
-              title: track.title,
-              artist: track.artist.name,
-              album: track.album.title,
-              cover: track.album.cover_small,
-              preview: track.preview
-            }).replace(/'/g, "&apos;")}'
-            ${inSelected ? 'disabled' : ''}
+            data-track='${JSON.stringify(trackData).replace(/'/g, '&apos;')}'
+            ${isAlreadySelected ? 'disabled' : ''}
           >
-            ${inSelected ? 'Added' : 'Add'}
+            ${isAlreadySelected ? 'Added' : 'Add'}
           </button>
         </div>
       </article>
@@ -126,10 +132,11 @@ const renderSongResults = (tracks) => {
 
   songResultsContainer.innerHTML = DOMPurify.sanitize(html)
 
-  // Add listeners to "Add" buttons
+  // Wire "Add" buttons
   songResultsContainer.querySelectorAll('.add-song-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const trackData = JSON.parse(btn.dataset.track.replace(/&apos;/g, "'"))
+
       if (!selectedSongs.some(s => s.id === trackData.id)) {
         selectedSongs.push(trackData)
         renderSelectedSongs()
@@ -141,6 +148,8 @@ const renderSongResults = (tracks) => {
 }
 
 const renderSelectedSongs = () => {
+  if (!selectedSongsList) return
+
   if (!selectedSongs.length) {
     selectedSongsList.innerHTML = '<p><i>No songs added yet.</i></p>'
     return
@@ -166,24 +175,7 @@ const renderSelectedSongs = () => {
   })
 }
 
-// ---------- Form submission ----------
-myForm.addEventListener('submit', async event => {
-  event.preventDefault()
-  const data = getFormData()
-  await saveItem(data)
-  myForm.reset()
-  selectedSongs = []
-  renderSelectedSongs()
-  showStep1()
-  formPopover.hidePopover()
-})
-
-// Skip songs just submits with whatever we have (often empty)
-skipSongsBtn.addEventListener('click', () => {
-  myForm.requestSubmit()
-})
-
-// ---------- Save item (Create or Update) ----------
+// ---------- SAVE (CREATE / UPDATE) ----------
 const saveItem = async (data) => {
   console.log('Saving:', data)
 
@@ -191,7 +183,7 @@ const saveItem = async (data) => {
   const method = data.id ? 'PUT' : 'POST'
 
   const options = {
-    method: method,
+    method,
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
@@ -203,14 +195,15 @@ const saveItem = async (data) => {
     const response = await fetch(endpoint, options)
 
     if (!response.ok) {
+      let errorText = response.statusText
       try {
         const errorData = await response.json()
-        console.error('Error:', errorData)
-        alert(errorData.error || response.statusText)
-      } catch (err) {
-        console.error(response.statusText)
-        alert('Failed to save: ' + response.statusText)
+        errorText = errorData.error || errorText
+      } catch (e) {
+        // ignore JSON parse error
       }
+      console.error('Save error:', errorText)
+      alert('Failed to save: ' + errorText)
       return
     }
 
@@ -223,10 +216,11 @@ const saveItem = async (data) => {
   }
 }
 
-// ---------- Edit item ----------
+// ---------- EDIT ----------
 const editItem = (data) => {
   console.log('Editing:', data)
 
+  // Populate form fields
   Object.keys(data).forEach(field => {
     const element = myForm.elements[field]
     if (!element) return
@@ -236,11 +230,11 @@ const editItem = (data) => {
     } else if (element.type === 'date') {
       element.value = data[field] ? data[field].substring(0, 10) : ''
     } else {
-      element.value = data[field]
+      element.value = data[field] ?? ''
     }
   })
 
-  // Load songs if present
+  // Load songs
   selectedSongs = Array.isArray(data.songs) ? data.songs : []
   renderSelectedSongs()
 
@@ -249,25 +243,28 @@ const editItem = (data) => {
   formPopover.showPopover()
 }
 
-// ---------- Delete item ----------
+// ---------- DELETE ----------
 const deleteItem = async (id) => {
-  if (!confirm('Are you sure you want to delete this ticket?')) {
-    return
-  }
+  if (!confirm('Are you sure you want to delete this ticket?')) return
 
   const endpoint = `/data/${id}`
-  const options = { method: 'DELETE' }
 
   try {
-    const response = await fetch(endpoint, options)
+    const response = await fetch(endpoint, { method: 'DELETE' })
 
     if (response.ok) {
       const result = await response.json()
       console.log('Deleted:', result)
       getData()
     } else {
-      const errorData = await response.json()
-      alert(errorData.error || 'Failed to delete item')
+      let errorText = 'Failed to delete item'
+      try {
+        const errorData = await response.json()
+        errorText = errorData.error || errorText
+      } catch (e) {
+        // ignore
+      }
+      alert(errorText)
     }
   } catch (error) {
     console.error('Delete error:', error)
@@ -275,7 +272,7 @@ const deleteItem = async (id) => {
   }
 }
 
-// ---------- Calendar widget ----------
+// ---------- CALENDAR WIDGET ----------
 const calendarWidget = (date) => {
   if (!date) return ''
   const d = new Date(date)
@@ -287,16 +284,16 @@ const calendarWidget = (date) => {
       <div class="month">${month}</div>
       <div class="day">${day}</div>
       <div class="year">${year}</div>
-    </div>`
+    </div>
+  `
 }
 
-// ---------- Render ticket card ----------
+// ---------- RENDER ONE TICKET CARD ----------
 const renderItem = (item) => {
   const div = document.createElement('div')
   div.classList.add('item-card')
   div.setAttribute('data-id', item.id)
 
-  // songs section
   let songsHtml = ''
   if (Array.isArray(item.songs) && item.songs.length > 0) {
     songsHtml = `
@@ -341,7 +338,11 @@ const renderItem = (item) => {
 
     <div class="item-info">
       <p><strong>Seat:</strong> ${item.seatInfo || '-'}</p>
-      <p><strong>Status:</strong> ${item.concertDate ? (new Date(item.concertDate) < new Date() ? 'Past' : 'Upcoming') : '-'}</p>
+      <p><strong>Status:</strong> ${
+        item.concertDate
+          ? (new Date(item.concertDate) < new Date() ? 'Past' : 'Upcoming')
+          : '-'
+      }</p>
     </div>
 
     <section class="description" style="${item.notes ? '' : 'display:none;'}">
@@ -364,7 +365,7 @@ const renderItem = (item) => {
   return div
 }
 
-// ---------- Popover fallbacks ----------
+// ---------- POPOVER FALLBACKS ----------
 if (formPopover) {
   if (!formPopover.showPopover) {
     formPopover.showPopover = function () {
@@ -381,42 +382,68 @@ if (formPopover) {
   }
 }
 
-// ---------- Create button ----------
+// ---------- CREATE BUTTON ----------
 createButton.addEventListener('click', (e) => {
   e.preventDefault()
   myForm.reset()
   selectedSongs = []
   renderSelectedSongs()
+
   if (myForm.elements['id']) {
     myForm.elements['id'].value = ''
   }
+
   formHeading.textContent = 'Add a Concert Ticket'
   showStep1()
   formPopover.showPopover()
 })
 
-// ---------- Step navigation ----------
-goToSongsBtn.addEventListener('click', () => {
-  showStep2()
-})
-
-backToInfoBtn.addEventListener('click', () => {
+// ---------- FORM SUBMIT ----------
+myForm.addEventListener('submit', async (event) => {
+  event.preventDefault()
+  const data = getFormData()
+  await saveItem(data)
+  myForm.reset()
+  selectedSongs = []
+  renderSelectedSongs()
   showStep1()
+  formPopover.hidePopover()
 })
 
-// ---------- Song search events ----------
-songSearchButton.addEventListener('click', () => {
-  searchSongs(songQueryInput.value)
-})
+// ---------- SKIP SONGS (OPTIONAL STEP) ----------
+if (skipSongsBtn) {
+  skipSongsBtn.addEventListener('click', () => {
+    // Submit the form with current data (songs may be empty)
+    myForm.requestSubmit()
+  })
+}
 
-songQueryInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    e.preventDefault()
+// ---------- STEP NAVIGATION ----------
+if (goToSongsBtn) {
+  goToSongsBtn.addEventListener('click', () => showStep2())
+}
+
+if (backToInfoBtn) {
+  backToInfoBtn.addEventListener('click', () => showStep1())
+}
+
+// ---------- SONG SEARCH EVENTS ----------
+if (songSearchButton) {
+  songSearchButton.addEventListener('click', () => {
     searchSongs(songQueryInput.value)
-  }
-})
+  })
+}
 
-// ---------- Reset heading on reset ----------
+if (songQueryInput) {
+  songQueryInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      searchSongs(songQueryInput.value)
+    }
+  })
+}
+
+// ---------- FORM RESET ----------
 myForm.addEventListener('reset', () => {
   formHeading.textContent = 'Add a Concert Ticket'
   selectedSongs = []
@@ -424,7 +451,7 @@ myForm.addEventListener('reset', () => {
   showStep1()
 })
 
-// ---------- Fetch + render all tickets ----------
+// ---------- LOAD DATA FROM /data ----------
 const getData = async () => {
   try {
     const response = await fetch('/data')
@@ -436,7 +463,7 @@ const getData = async () => {
       const data = await response.json()
       console.log('Fetched data:', data)
 
-      if (data.length === 0) {
+      if (!data.length) {
         contentArea.innerHTML = '<p><i>No data found in the database.</i></p>'
         return
       }
@@ -458,8 +485,7 @@ const getData = async () => {
   }
 }
 
-// Initial load
+// ---------- INITIALIZE ----------
 getData()
-
-// Initial selected songs placeholder
 renderSelectedSongs()
+showStep1()

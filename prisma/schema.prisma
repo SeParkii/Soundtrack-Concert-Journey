@@ -22,5 +22,7 @@ model tickets {
   seatInfo      String?
 
   notes         String?
+
+  songs         Json?
 }
 
