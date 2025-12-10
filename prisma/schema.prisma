@@ -20,6 +20,7 @@ model tickets {
   notes         String?
 
   songs         Json?
+  posterUrl     String?
 }
 
 

@@ -160,6 +160,20 @@ header p {
   text-align: left;
 }
 
+/* Make the top info row + calendar sit side-by-side */
+.item-card .item-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;  /* top align */
+  gap: 2rem;
+}
+
+/* Left side takes the remaining width */
+.item-info-text {
+  flex: 1;
+}
+
+
 .item-card h3 {
   font-size: 1.9rem;
   margin: 0 0 0.3rem 0;
@@ -244,18 +258,13 @@ header p {
   }
 }
 
-
-
-/* =============================
-   CALENDAR WIDGET
-   Pinned to the right, vertically centered
-============================= */
-
 .item-card .calendar {
-  position: absolute;
-  right: 3rem;
-  top: 50%;
-  transform: translateY(-50%);
+  /* no absolute positioning – it will sit in the flex row */
+  position: static;
+  right: auto;
+  top: auto;
+  transform: none;
+
   width: 6rem;
   display: flex;
   flex-direction: column;
@@ -265,6 +274,7 @@ header p {
   background: #fff;
   text-align: center;
 }
+
 
 /* In case calendar appears outside .item-card somehow, keep generic styling */
 .calendar img {
@@ -298,6 +308,18 @@ header p {
   padding: 0.35rem 0;
 }
 
+.concert-image {
+  margin-top: 1.5rem;
+}
+
+.concert-image img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 1.2rem;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
 
 
 /* =============================

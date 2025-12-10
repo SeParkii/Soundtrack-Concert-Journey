@@ -24,7 +24,6 @@ const selectedSongsList = document.querySelector('#selectedSongsList')
 let selectedSongs = []
 
 // ---------- STEP HELPERS ----------
-// ---------- STEP HELPERS ----------
 const showStep1 = () => {
   if (step1) {
     step1.hidden = false
@@ -48,6 +47,8 @@ const showStep2 = () => {
   // make sure user sees the top of step 2
   if (formPopover) formPopover.scrollTop = 0
 }
+
+
 
 
 // ---------- FORM DATA HELPER ----------
@@ -371,10 +372,13 @@ const renderItem = (item) => {
     </div>
 
     <div class="item-info">
-      <p><strong>Venue:</strong> ${item.venue || '-'}</p>
-      <p><strong>City:</strong> ${item.city || '-'}</p>
+      <div class="item-info-text">
+        <p><strong>Venue:</strong> ${item.venue || '-'}</p>
+        <p><strong>City:</strong> ${item.city || '-'}</p>
+      </div>
       ${calendarWidget(item.concertDate)}
     </div>
+
 
     <div class="stats">
       <div class="stat">
@@ -401,6 +405,16 @@ const renderItem = (item) => {
     <section class="description" style="${item.notes ? '' : 'display:none;'}">
       <p>${item.notes || ''}</p>
     </section>
+
+    ${
+      item.posterUrl
+        ? `
+          <figure class="concert-image">
+            <img src="${item.posterUrl}" alt="Concert image for ${item.concertName || 'concert'}">
+          </figure>
+        `
+        : ''
+    }
 
     ${songsHtml}
 
