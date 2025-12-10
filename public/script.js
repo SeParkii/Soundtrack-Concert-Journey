@@ -294,18 +294,43 @@ const renderItem = (item) => {
   div.classList.add('item-card')
   div.setAttribute('data-id', item.id)
 
+  // --- Make sure songs is an array ---
+  let songsArray = []
+  if (Array.isArray(item.songs)) {
+    songsArray = item.songs
+  } else if (item.songs && typeof item.songs === 'string') {
+    // In case Prisma stored JSON as a string for some reason
+    try {
+      songsArray = JSON.parse(item.songs)
+    } catch (e) {
+      console.warn('Could not parse songs JSON:', e)
+    }
+  }
+
+  // --- Build the songs section HTML ---
   let songsHtml = ''
-  if (Array.isArray(item.songs) && item.songs.length > 0) {
+  if (songsArray.length > 0) {
     songsHtml = `
       <section class="songs-section">
         <h4>Songs from this concert</h4>
-        <ul>
-          ${item.songs.map(song => `
-            <li>
-              <strong>${song.title}</strong> – ${song.artist}
-              ${song.preview ? `<audio controls src="${song.preview}"></audio>` : ''}
+        <ul class="songs-list">
+          ${songsArray
+            .map(
+              (song) => `
+            <li class="song-item">
+              <div class="song-meta">
+                <strong>${song.title || 'Unknown title'}</strong>
+                <span class="song-artist"> – ${song.artist || 'Unknown artist'}</span>
+              </div>
+              ${
+                song.preview
+                  ? `<audio controls src="${song.preview}"></audio>`
+                  : `<span class="no-preview"><i>No preview available</i></span>`
+              }
             </li>
-          `).join('')}
+          `
+            )
+            .join('')}
         </ul>
       </section>
     `
@@ -340,7 +365,9 @@ const renderItem = (item) => {
       <p><strong>Seat:</strong> ${item.seatInfo || '-'}</p>
       <p><strong>Status:</strong> ${
         item.concertDate
-          ? (new Date(item.concertDate) < new Date() ? 'Past' : 'Upcoming')
+          ? new Date(item.concertDate) < new Date()
+            ? 'Past'
+            : 'Upcoming'
           : '-'
       }</p>
     </div>
@@ -364,6 +391,7 @@ const renderItem = (item) => {
 
   return div
 }
+
 
 // ---------- POPOVER FALLBACKS ----------
 if (formPopover) {
