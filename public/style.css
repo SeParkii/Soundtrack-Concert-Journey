@@ -319,6 +319,9 @@ main,
   width: min(1100px, calc(100% - 8rem));
   margin: 2rem auto;
   box-shadow: 0 8px 30px rgba(10,30,40,0.12);
+    max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+
 }
 
 #formPopover::backdrop {
@@ -337,6 +340,27 @@ main,
 /* =============================
    FORM LAYOUT – 4 COLUMN GRID
 ============================= */
+
+/* Shared style for all form buttons */
+.form-btn,
+.cancel,
+.save,
+#skipSongsButton {
+  background: #e6f6ff;
+  color: #052023;
+  border: none;
+  padding: 0.7rem 1.8rem;
+  font-weight: 700;
+  border-radius: 999px; /* pill shape */
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.03);
+}
+
+.form-btn:hover,
+.cancel:hover,
+.save:hover {
+  background: #f3fbff;
+}
 
 /* The whole form itself */
 #myForm {
@@ -394,6 +418,172 @@ main,
   margin-top: 1.8rem;
 }
 
+/* STEP 2 layout */
+#step-2 {
+  margin-top: 1.5rem;
+}
+
+/* Center the headings + helper text like pic2 */
+#step-2 h3,
+#step-2 p {
+  text-align: center;
+}
+
+/* Basic field styling */
+#step-2 fieldset {
+  border: none;
+  margin: 0 0 1rem 0;
+  padding: 0;
+}
+
+#step-2 label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  color: #e6f6ff;
+}
+
+/* SONG RESULTS: 2 per row with its own scroll area */
+#songResults {
+  margin-top: 1rem;
+  max-height: 320px;                 /* adjust height if you want */
+  padding-right: 0.5rem;
+  overflow-y: auto;                   /* scroll inside */
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+/* Each song card */
+.song-card {
+  background: rgba(230, 246, 255, 0.15);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* top row: cover + title/artist */
+.song-main {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.song-main img {
+  width: 48px;
+  height: 48px;
+  border-radius: 0.5rem;
+  object-fit: cover;
+}
+
+.song-title {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.song-artist {
+  margin: 0.1rem 0 0 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* bottom: audio + Add button */
+.song-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.song-actions audio {
+  width: 100%;
+}
+
+.add-song-btn {
+  align-self: flex-end;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: none;
+  background: #e6f6ff;
+  color: #052023;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-song-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* On small screens, go back to 1 column */
+@media (max-width: 900px) {
+  #songResults {
+    grid-template-columns: 1fr;
+    max-height: 260px;
+  }
+}
+
+/* Search bar full width + button to the right */
+#step-2 fieldset:first-of-type {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+#step-2 fieldset:first-of-type label {
+  grid-column: 1 / -1;
+}
+
+#step-2 fieldset:first-of-type input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: #e6f6ff;
+  color: #052023;
+}
+
+#step-2 fieldset:first-of-type button {
+  padding: 0.6rem 1.4rem;
+}
+
+/* Small "Powered by Deezer" text */
+#step-2 fieldset:first-of-type small {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+/* Song results spacing */
+#songResults,
+#selectedSongsList {
+  margin-top: 1rem;
+}
+
+/* STEP 2 bottom buttons: Skip & Save / Save / Cancel */
+#step-2 fieldset:last-of-type {
+  display: flex;
+  justify-content: center;
+  gap: 1.8rem;
+  margin-top: 1.75rem;
+}
+
+/* Make these buttons visually match Step 1 */
+#step-2 fieldset:last-of-type button {
+  background: #e6f6ff;
+  color: #052023;
+  border: none;
+  padding: 0.7rem 1.8rem;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+#step-2 fieldset:last-of-type button:hover {
+  background: #f3fbff;
+}
 
 #myForm fieldset {
   border: none;

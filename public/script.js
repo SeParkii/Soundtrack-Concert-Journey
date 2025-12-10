@@ -24,15 +24,31 @@ const selectedSongsList = document.querySelector('#selectedSongsList')
 let selectedSongs = []
 
 // ---------- STEP HELPERS ----------
+// ---------- STEP HELPERS ----------
 const showStep1 = () => {
-  if (step1) step1.hidden = false
-  if (step2) step2.hidden = true
+  if (step1) {
+    step1.hidden = false
+    step1.style.display = 'grid'   // keep grid layout
+  }
+  if (step2) {
+    step2.hidden = true
+    step2.style.display = 'none'
+  }
 }
 
 const showStep2 = () => {
-  if (step1) step1.hidden = true
-  if (step2) step2.hidden = false
+  if (step1) {
+    step1.hidden = true
+    step1.style.display = 'none'
+  }
+  if (step2) {
+    step2.hidden = false
+    step2.style.display = 'block'
+  }
+  // make sure user sees the top of step 2
+  if (formPopover) formPopover.scrollTop = 0
 }
+
 
 // ---------- FORM DATA HELPER ----------
 const getFormData = () => {
