@@ -212,14 +212,23 @@ const saveItem = async (data) => {
 
     if (!response.ok) {
       let errorText = response.statusText
+      let errorData = null
+
       try {
-        const errorData = await response.json()
-        errorText = errorData.error || errorText
+        errorData = await response.json()
+        // Prefer detailed message if available
+        errorText = errorData.details || errorData.error || errorText
       } catch (e) {
         // ignore JSON parse error
       }
-      console.error('Save error:', errorText)
-      alert('Failed to save: ' + errorText)
+
+      console.error('Save error (full):', errorData || errorText)
+
+      // Show full info in the alert so we can see Prisma’s exact error
+      alert(
+        'Failed to save:\n' +
+        (errorData ? JSON.stringify(errorData, null, 2) : errorText)
+      )
       return
     }
 
@@ -231,6 +240,7 @@ const saveItem = async (data) => {
     alert('An error occurred while saving')
   }
 }
+
 
 // ---------- EDIT ----------
 const editItem = (data) => {

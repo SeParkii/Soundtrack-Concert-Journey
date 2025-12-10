@@ -69,14 +69,10 @@ router.post('/data', async (req, res) => {
     // MongoDB will auto-generate an ID for new records
     const { id, ...createData } = req.body
 
-    // ⭐ Make sure songs is always an array (or empty array)
-    const songs = Array.isArray(req.body.songs) ? req.body.songs : []
-
+    // createData now includes songs if the frontend sent it.
+    // Prisma will store it in the `songs Json?` field.
     const created = await prisma[model].create({
-      data: {
-        ...createData,
-        songs  // ⭐ explicitly store songs JSON
-      }
+      data: createData
     })
     res.status(201).send(created)
   } catch (err) {
@@ -140,19 +136,10 @@ router.put('/data/:id', async (req, res) => {
     // The id should not be in the data payload for updates
     const { id, ...updateData } = req.body
 
-    // ⭐ If songs is provided, normalise it; if not, leave as-is
-    const hasSongs = Object.prototype.hasOwnProperty.call(req.body, 'songs')
-    const songs = hasSongs && Array.isArray(req.body.songs) ? req.body.songs : undefined
-
-    const dataToUpdate = {
-      ...updateData,
-      ...(hasSongs ? { songs } : {})   // ⭐ only set songs if frontend sent it
-    }
-
-    // Prisma update returns the updated version by default
+    // updateData will also include songs if the frontend sends it
     const updated = await prisma[model].update({
       where: { id: req.params.id },
-      data: dataToUpdate
+      data: updateData
     })
     res.send(updated)
   } catch (err) {
