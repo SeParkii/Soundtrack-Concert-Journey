@@ -190,6 +190,64 @@ header p {
 }
 
 
+/* ===== SONGS ON TICKET CARD ===== */
+
+.songs-section {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.songs-section h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+}
+
+/* 2 songs per row */
+.songs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.song-item {
+  background: rgba(230, 246, 255, 0.15);
+  border-radius: 0.9rem;
+  padding: 0.55rem 0.7rem;
+}
+
+.song-item .song-meta {
+  font-size: 0.9rem;
+}
+
+.song-item .song-artist {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+/* Audio player full width inside each pill */
+.song-item audio {
+  width: 100%;
+  margin-top: 0.35rem;
+}
+
+/* "No preview" text */
+.song-item .no-preview {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+/* On small screens, switch back to 1 column */
+@media (max-width: 900px) {
+  .songs-list {
+    grid-template-columns: 1fr;
+  }
+}
 
 
 

@@ -70,7 +70,7 @@ const getFormData = () => {
   })
 
   // Attach songs to payload
-  // json.songs = selectedSongs   // remove or comment this line
+  json.songs = selectedSongs   // remove or comment this line
 
 
   return json
