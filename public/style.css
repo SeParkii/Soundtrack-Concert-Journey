@@ -173,11 +173,6 @@ header p {
   opacity: 0.9;
 }
 
-/* If you have a dedicated .meta wrapper, just treat it as normal text */
-.item-card .meta {
-  /* no layout rules here – let it flow with the rest of the text */
-}
-
 /* Add larger spacing between Status and Notes */
 .item-card .description {
   margin-top: 2rem;   /* adjust this number */
