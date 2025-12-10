@@ -338,11 +338,62 @@ main,
    FORM LAYOUT – 4 COLUMN GRID
 ============================= */
 
+/* The whole form itself */
 #myForm {
+  display: block;
+}
+
+/* STEP 1: 4-column grid like your pic2 */
+#step-1 {
+  margin-top: 1.5rem;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.6rem;
 }
+
+#step-1 fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+#step-1 label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  color: #e6f6ff;
+}
+
+#step-1 input,
+#step-1 select,
+#step-1 textarea {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: #e6f6ff;
+  color: #052023;
+}
+
+/* Notes field spans the full width */
+#step-1 fieldset:has(#notes) {
+  grid-column: 1 / -1;
+}
+
+/* Make the textarea tall */
+#step-1 textarea {
+  min-height: 12rem;
+}
+
+/* STEP 1 buttons row (Next + Cancel) centered at bottom */
+#step-1 fieldset:last-of-type {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin-top: 1.8rem;
+}
+
 
 #myForm fieldset {
   border: none;
