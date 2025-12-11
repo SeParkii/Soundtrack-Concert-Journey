@@ -406,15 +406,16 @@ const renderItem = (item) => {
       <p>${item.notes || ''}</p>
     </section>
 
-    ${
-      item.posterUrl
-        ? `
-          <figure class="concert-image">
-            <img src="${item.posterUrl}" alt="Concert image for ${item.concertName || 'concert'}">
-          </figure>
-        `
-        : ''
-    }
+${
+  item.posterUrl
+    ? `
+      <figure class="concert-image">
+        <img src="${item.posterUrl}" alt="Concert image for ${item.concertName || 'concert'}">
+      </figure>
+    `
+    : ''
+}
+
 
     ${songsHtml}
 
