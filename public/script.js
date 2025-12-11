@@ -338,14 +338,23 @@ const renderItem = (item) => {
     }
   }
 
-  // Poster image HTML
-  const imageHtml = item.posterUrl
-    ? `
-      <figure class="concert-image">
+  // Poster images HTML (support up to two images: posterUrl & posterUrl2)
+  const imageParts = []
+  if (item.posterUrl) {
+    imageParts.push(`
+      <figure class="concert-image main-image">
         <img src="${item.posterUrl}" alt="Concert image for ${item.concertName || 'concert'}">
       </figure>
-    `
-    : ''
+    `)
+  }
+  if (item.posterUrl2) {
+    imageParts.push(`
+      <figure class="concert-image secondary-image">
+        <img src="${item.posterUrl2}" alt="Second concert image for ${item.concertName || 'concert'}">
+      </figure>
+    `)
+  }
+  const imagesHtml = imageParts.join('')
 
   // Songs section HTML
   let songsHtml = ''
@@ -405,7 +414,7 @@ const renderItem = (item) => {
       </div>
 
       <div class="top-row-right">
-        ${imageHtml}
+        ${imagesHtml}
       </div>
     </div>
 

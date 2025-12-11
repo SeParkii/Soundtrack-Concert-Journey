@@ -18,9 +18,9 @@ model tickets {
   price         Float?
   seatInfo      String?
   notes         String?
-
   songs         Json?
   posterUrl     String?
+  posterUrl2    String?
 }
 
 
