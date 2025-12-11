@@ -134,6 +134,20 @@ header p {
 
 .top-row-left {
   flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.top-row-right {
+  flex: 1.2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.top-row-left {
+  flex: 2;
 }
 
 .top-row-right {
@@ -279,7 +293,7 @@ header p {
 }
 
 .item-card .calendar {
-  position: static;        /* no absolute positioning */
+  position: static;
   transform: none;
   right: auto;
   top: auto;
@@ -295,6 +309,9 @@ header p {
 }
 
 
+.calendar-inline {
+  margin-top: 1.75rem;   /* pushes it down into the green area */
+}
 
 /* In case calendar appears outside .item-card somehow, keep generic styling */
 .calendar img {
@@ -330,6 +347,7 @@ header p {
 
 .concert-image {
   width: 100%;
+  max-width: 260px;   /* controls poster size (tweak if you want) */
   background: rgba(230, 246, 255, 0.4);
   border-radius: 1.4rem;
   overflow: hidden;
@@ -620,14 +638,15 @@ main,
   }
 
   .top-row-right {
-    align-items: flex-start;
     width: 100%;
+    justify-content: flex-start;
   }
 
   .concert-image {
     max-width: 100%;
   }
 }
+
 
 
 /* Search bar full width + button to the right */

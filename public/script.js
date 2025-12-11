@@ -371,7 +371,7 @@ const renderItem = (item) => {
     `
   }
 
-  const template = /*html*/`
+    const template = /*html*/`
     <div class="item-heading">
       <h3>${item.concertName || 'Untitled Concert'}</h3>
       <div class="microchip-info">
@@ -379,7 +379,7 @@ const renderItem = (item) => {
       </div>
     </div>
 
-    <!-- TOP ROW: text on the left, calendar + image on the right -->
+    <!-- TOP ROW: left = details + calendar, right = poster image -->
     <div class="top-row">
       <div class="top-row-left">
         <p><strong>Venue:</strong> ${item.venue || '-'}</p>
@@ -396,10 +396,15 @@ const renderItem = (item) => {
               : 'Upcoming'
             : '-'
         }</p>
+
+        <!-- calendar moved to the left column (green box) -->
+        <div class="calendar-inline">
+          ${calendarWidget(item.concertDate)}
+        </div>
       </div>
 
+      <!-- right column = only the image now (red box) -->
       <div class="top-row-right">
-        ${calendarWidget(item.concertDate)}
         ${imageHtml}
       </div>
     </div>
