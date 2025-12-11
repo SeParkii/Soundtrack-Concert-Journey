@@ -23,31 +23,30 @@ const selectedSongsList = document.querySelector('#selectedSongsList')
 // Keep selected songs in memory
 let selectedSongs = []
 
-// ---------- STEP HELPERS ----------
+// ============================
+// STEP HELPERS
+// ============================
 const showStep1 = () => {
-  if (step1) {
-    step1.hidden = false
-    step1.style.display = 'grid' // keep grid layout
-  }
-  if (step2) {
-    step2.hidden = true
-    step2.style.display = 'none'
-  }
+  if (!step1 || !step2) return
+  step1.hidden = false
+  step1.style.display = 'grid'   // keep grid layout
+  step2.hidden = true
+  step2.style.display = 'none'
 }
 
 const showStep2 = () => {
-  if (step1) {
-    step1.hidden = true
-    step1.style.display = 'none'
-  }
-  if (step2) {
-    step2.hidden = false
-    step2.style.display = 'block'
-  }
+  if (!step1 || !step2) return
+  step1.hidden = true
+  step1.style.display = 'none'
+  step2.hidden = false
+  step2.style.display = 'block'
+
   if (formPopover) formPopover.scrollTop = 0
 }
 
-// ---------- FORM DATA HELPER ----------
+// ============================
+// FORM DATA HELPER
+// ============================
 const getFormData = () => {
   const formData = new FormData(myForm)
   const json = Object.fromEntries(formData)
@@ -72,7 +71,9 @@ const getFormData = () => {
   return json
 }
 
-// ---------- DEEZER: SEARCH + RENDER ----------
+// ============================
+// DEEZER: SEARCH + RENDER
+// ============================
 const searchSongs = async (query) => {
   if (!query || !query.trim()) return
 
@@ -102,17 +103,18 @@ const searchSongs = async (query) => {
   }
 }
 
+// Render search results – audio created with JS, no time limit in our code
 const renderSongResults = (tracks) => {
   if (!tracks.length) {
     songResultsContainer.innerHTML = '<p><i>No results found.</i></p>'
     return
   }
 
-  // Show ALL tracks returned by the backend (which already merged all pages)
-  const html = tracks.map(track => {
+  songResultsContainer.innerHTML = ''
+
+  tracks.forEach(track => {
     const isAlreadySelected = selectedSongs.some(s => s.id === track.id)
 
-    // Fix Deezer http:// previews for https sites
     const previewUrl = track.preview
       ? track.preview.replace(/^http:\/\//, 'https://')
       : ''
@@ -126,84 +128,133 @@ const renderSongResults = (tracks) => {
       preview: previewUrl
     }
 
-    return `
-      <article class="song-card">
-        <div class="song-main">
-          ${trackData.cover
-            ? `<img src="${trackData.cover}" alt="Album cover for ${trackData.album}">`
-            : ''}
-          <div>
-            <p class="song-title"><strong>${trackData.title}</strong></p>
-            <p class="song-artist">${trackData.artist}</p>
-          </div>
-        </div>
-        <div class="song-actions">
-          ${trackData.preview
-            ? `<audio controls src="${trackData.preview}"></audio>`
-            : `<p><i>No preview available</i></p>`}
-          <button
-            type="button"
-            class="add-song-btn"
-            data-track='${JSON.stringify(trackData).replace(/'/g, '&apos;')}'
-            ${isAlreadySelected ? 'disabled' : ''}
-          >
-            ${isAlreadySelected ? 'Added' : 'Add'}
-          </button>
-        </div>
-      </article>
-    `
-  }).join('')
+    const card = document.createElement('article')
+    card.className = 'song-card'
 
-  songResultsContainer.innerHTML = DOMPurify.sanitize(html)
+    // ---- TOP: cover + title + artist ----
+    const main = document.createElement('div')
+    main.className = 'song-main'
 
-  // Wire "Add" buttons
-  songResultsContainer.querySelectorAll('.add-song-btn').forEach(btn => {
+    if (trackData.cover) {
+      const img = document.createElement('img')
+      img.src = trackData.cover
+      img.alt = `Album cover for ${trackData.album}`
+      main.appendChild(img)
+    }
+
+    const infoBox = document.createElement('div')
+    const titleP = document.createElement('p')
+    titleP.className = 'song-title'
+    titleP.innerHTML = `<strong>${trackData.title}</strong>`
+
+    const artistP = document.createElement('p')
+    artistP.className = 'song-artist'
+    artistP.textContent = trackData.artist
+
+    infoBox.appendChild(titleP)
+    infoBox.appendChild(artistP)
+    main.appendChild(infoBox)
+    card.appendChild(main)
+
+    // ---- BOTTOM: audio + button ----
+    const actions = document.createElement('div')
+    actions.className = 'song-actions'
+
+    if (trackData.preview) {
+      const audio = document.createElement('audio')
+      audio.controls = true
+      audio.preload = 'auto'     // allow full preview buffering
+      audio.src = trackData.preview
+
+      // optional debug: see real duration (~30s)
+      audio.addEventListener('loadedmetadata', () => {
+        console.log('Preview duration for', trackData.title, ':', audio.duration)
+      })
+
+      actions.appendChild(audio)
+    } else {
+      const noPreview = document.createElement('p')
+      noPreview.innerHTML = '<i>No preview available</i>'
+      actions.appendChild(noPreview)
+    }
+
+    const btn = document.createElement('button')
+    btn.type = 'button'
+    btn.className = 'add-song-btn'
+    btn.textContent = isAlreadySelected ? 'Added' : 'Add'
+    btn.disabled = isAlreadySelected
+    btn.dataset.track = JSON.stringify(trackData)
+
     btn.addEventListener('click', () => {
-      const trackData = JSON.parse(btn.dataset.track.replace(/&apos;/g, "'"))
-
-      if (!selectedSongs.some(s => s.id === trackData.id)) {
-        selectedSongs.push(trackData)
+      const t = JSON.parse(btn.dataset.track)
+      if (!selectedSongs.some(s => s.id === t.id)) {
+        selectedSongs.push(t)
         renderSelectedSongs()
         btn.disabled = true
         btn.textContent = 'Added'
       }
     })
+
+    actions.appendChild(btn)
+    card.appendChild(actions)
+
+    songResultsContainer.appendChild(card)
   })
 }
 
+// ============================
+// SELECTED SONGS LIST
+// ============================
 const renderSelectedSongs = () => {
   if (!selectedSongsList) return
+
+  selectedSongsList.innerHTML = ''
 
   if (!selectedSongs.length) {
     selectedSongsList.innerHTML = '<p><i>No songs added yet.</i></p>'
     return
   }
 
-  const html = selectedSongs.map(song => `
-    <div class="selected-song" data-id="${song.id}">
-      <span>${song.title} – ${song.artist}</span>
-      ${
-        song.preview
-          ? `<audio controls src="${song.preview.replace(/^http:\/\//, 'https://')}"></audio>`
-          : ''
-      }
-      <button type="button" class="remove-song-btn">Remove</button>
-    </div>
-  `).join('')
+  selectedSongs.forEach(song => {
+    const wrapper = document.createElement('div')
+    wrapper.className = 'selected-song'
+    wrapper.dataset.id = song.id
 
-  selectedSongsList.innerHTML = DOMPurify.sanitize(html)
+    const label = document.createElement('span')
+    label.textContent = `${song.title} – ${song.artist}`
+    wrapper.appendChild(label)
 
-  selectedSongsList.querySelectorAll('.remove-song-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const parent = btn.closest('.selected-song')
-      const id = Number(parent.dataset.id)
-      selectedSongs = selectedSongs.filter(song => song.id !== id)
+    if (song.preview) {
+      const audio = document.createElement('audio')
+      audio.controls = true
+      audio.preload = 'auto'
+      audio.src = song.preview.replace(/^http:\/\//, 'https://')
+
+      audio.addEventListener('loadedmetadata', () => {
+        console.log('Selected preview duration:', audio.duration)
+      })
+
+      wrapper.appendChild(audio)
+    }
+
+    const removeBtn = document.createElement('button')
+    removeBtn.type = 'button'
+    removeBtn.className = 'remove-song-btn'
+    removeBtn.textContent = 'Remove'
+    removeBtn.addEventListener('click', () => {
+      const id = Number(wrapper.dataset.id)
+      selectedSongs = selectedSongs.filter(s => s.id !== id)
       renderSelectedSongs()
     })
+
+    wrapper.appendChild(removeBtn)
+    selectedSongsList.appendChild(wrapper)
   })
 }
 
-// ---------- SAVE (CREATE / UPDATE) ----------
+// ============================
+// SAVE (CREATE / UPDATE)
+// ============================
 const saveItem = async (data) => {
   console.log('Saving:', data)
 
@@ -250,7 +301,9 @@ const saveItem = async (data) => {
   }
 }
 
-// ---------- EDIT ----------
+// ============================
+// EDIT
+// ============================
 const editItem = (data) => {
   console.log('Editing:', data)
 
@@ -275,7 +328,9 @@ const editItem = (data) => {
   formPopover.showPopover()
 }
 
-// ---------- DELETE ----------
+// ============================
+// DELETE
+// ============================
 const deleteItem = async (id) => {
   if (!confirm('Are you sure you want to delete this ticket?')) return
 
@@ -304,7 +359,9 @@ const deleteItem = async (id) => {
   }
 }
 
-// ---------- CALENDAR WIDGET ----------
+// ============================
+// CALENDAR WIDGET
+// ============================
 const calendarWidget = (date) => {
   if (!date) return ''
   const d = new Date(date)
@@ -320,7 +377,9 @@ const calendarWidget = (date) => {
   `
 }
 
-// ---------- RENDER ONE TICKET CARD ----------
+// ============================
+// RENDER ONE TICKET CARD
+// ============================
 const renderItem = (item) => {
   const div = document.createElement('div')
   div.classList.add('item-card')
@@ -338,7 +397,7 @@ const renderItem = (item) => {
     }
   }
 
-  // Poster images HTML (support up to two images: posterUrl & posterUrl2)
+  // Poster images HTML
   const imageParts = []
   if (item.posterUrl) {
     imageParts.push(`
@@ -355,33 +414,6 @@ const renderItem = (item) => {
     `)
   }
   const imagesHtml = imageParts.join('')
-
-  // Songs section HTML
-  let songsHtml = ''
-  if (songsArray.length > 0) {
-    songsHtml = `
-      <section class="songs-section">
-        <h4>Songs from this concert</h4>
-        <ul class="songs-list">
-          ${songsArray
-            .map(song => `
-              <li class="song-item">
-                <div class="song-meta">
-                  <strong>${song.title || 'Unknown title'}</strong>
-                  <span class="song-artist"> – ${song.artist || 'Unknown artist'}</span>
-                </div>
-                ${
-                  song.preview
-                    ? `<audio controls src="${song.preview.replace(/^http:\/\//, 'https://')}"></audio>`
-                    : `<span class="no-preview"><i>No preview available</i></span>`
-                }
-              </li>
-            `)
-            .join('')}
-        </ul>
-      </section>
-    `
-  }
 
   const template = /* html */`
     <div class="item-heading">
@@ -422,7 +454,10 @@ const renderItem = (item) => {
       <p>${item.notes || ''}</p>
     </section>
 
-    ${songsHtml}
+    <section class="songs-section" style="${songsArray.length ? '' : 'display:none;'}">
+      <h4>Songs from this concert</h4>
+      <ul class="songs-list"></ul>
+    </section>
 
     <div class="item-actions">
       <button class="edit-btn">Edit</button>
@@ -432,13 +467,48 @@ const renderItem = (item) => {
 
   div.innerHTML = DOMPurify.sanitize(template)
 
+  // ---- Inject songs with real audio elements ----
+  if (songsArray.length) {
+    const ul = div.querySelector('.songs-list')
+    songsArray.forEach(song => {
+      const li = document.createElement('li')
+      li.className = 'song-item'
+
+      const meta = document.createElement('div')
+      meta.className = 'song-meta'
+      meta.innerHTML = `
+        <strong>${song.title || 'Unknown title'}</strong>
+        <span class="song-artist"> – ${song.artist || 'Unknown artist'}</span>
+      `
+      li.appendChild(meta)
+
+      if (song.preview) {
+        const audio = document.createElement('audio')
+        audio.controls = true
+        audio.preload = 'auto'
+        audio.src = song.preview.replace(/^http:\/\//, 'https://')
+        li.appendChild(audio)
+      } else {
+        const noPrev = document.createElement('span')
+        noPrev.className = 'no-preview'
+        noPrev.innerHTML = '<i>No preview available</i>'
+        li.appendChild(noPrev)
+      }
+
+      ul.appendChild(li)
+    })
+  }
+
+  // edit/delete handlers
   div.querySelector('.edit-btn').addEventListener('click', () => editItem(item))
   div.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id))
 
   return div
 }
 
-// ---------- POPOVER FALLBACKS ----------
+// ============================
+// POPOVER FALLBACKS
+// ============================
 if (formPopover) {
   if (!formPopover.showPopover) {
     formPopover.showPopover = function () {
@@ -455,42 +525,62 @@ if (formPopover) {
   }
 }
 
-// ---------- CREATE BUTTON ----------
-createButton.addEventListener('click', (e) => {
-  e.preventDefault()
-  myForm.reset()
-  selectedSongs = []
-  renderSelectedSongs()
+// ============================
+// CREATE BUTTON
+// ============================
+if (createButton) {
+  createButton.addEventListener('click', (e) => {
+    e.preventDefault()
+    myForm.reset()
+    selectedSongs = []
+    renderSelectedSongs()
 
-  if (myForm.elements['id']) {
-    myForm.elements['id'].value = ''
-  }
+    if (myForm.elements['id']) {
+      myForm.elements['id'].value = ''
+    }
 
-  formHeading.textContent = 'Add a Concert Ticket'
-  showStep1()
-  formPopover.showPopover()
-})
+    formHeading.textContent = 'Add a Concert Ticket'
+    showStep1()
+    formPopover.showPopover()
+  })
+}
 
-// ---------- FORM SUBMIT ----------
-myForm.addEventListener('submit', async (event) => {
-  event.preventDefault()
-  const data = getFormData()
-  await saveItem(data)
-  myForm.reset()
-  selectedSongs = []
-  renderSelectedSongs()
-  showStep1()
-  formPopover.hidePopover()
-})
+// ============================
+// FORM SUBMIT
+// ============================
+if (myForm) {
+  myForm.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const data = getFormData()
+    await saveItem(data)
+    myForm.reset()
+    selectedSongs = []
+    renderSelectedSongs()
+    showStep1()
+    formPopover.hidePopover()
+  })
 
-// ---------- SKIP SONGS (OPTIONAL STEP) ----------
+  // FORM RESET
+  myForm.addEventListener('reset', () => {
+    formHeading.textContent = 'Add a Concert Ticket'
+    selectedSongs = []
+    renderSelectedSongs()
+    showStep1()
+  })
+}
+
+// ============================
+// SKIP SONGS (OPTIONAL)
+// ============================
 if (skipSongsBtn) {
   skipSongsBtn.addEventListener('click', () => {
     myForm.requestSubmit()
   })
 }
 
-// ---------- STEP NAVIGATION ----------
+// ============================
+// STEP NAVIGATION
+// ============================
 if (goToSongsBtn) {
   goToSongsBtn.addEventListener('click', () => showStep2())
 }
@@ -499,7 +589,9 @@ if (backToInfoBtn) {
   backToInfoBtn.addEventListener('click', () => showStep1())
 }
 
-// ---------- SONG SEARCH EVENTS ----------
+// ============================
+// SONG SEARCH EVENTS
+// ============================
 if (songSearchButton) {
   songSearchButton.addEventListener('click', () => {
     searchSongs(songQueryInput.value)
@@ -515,15 +607,9 @@ if (songQueryInput) {
   })
 }
 
-// ---------- FORM RESET ----------
-myForm.addEventListener('reset', () => {
-  formHeading.textContent = 'Add a Concert Ticket'
-  selectedSongs = []
-  renderSelectedSongs()
-  showStep1()
-})
-
-// ---------- LOAD DATA FROM /data ----------
+// ============================
+// LOAD DATA FROM /data
+// ============================
 const getData = async () => {
   try {
     const response = await fetch('/data')
@@ -548,8 +634,8 @@ const getData = async () => {
     } else {
       notReadyStatus.style.display = 'block'
       readyStatus.style.display = 'none'
-      createButton.style.display = 'none'
-      contentArea.style.display = 'none'
+      if (createButton) createButton.style.display = 'none'
+      if (contentArea) contentArea.style.display = 'none'
     }
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -557,7 +643,9 @@ const getData = async () => {
   }
 }
 
-// ---------- INITIALIZE ----------
+// ============================
+// INITIALIZE
+// ============================
 getData()
 renderSelectedSongs()
 showStep1()

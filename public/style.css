@@ -408,7 +408,7 @@ main,
 }
 
 #formPopover h2 {
-  margin: 0 0 1.5rem 0;
+  margin: 0 0.2rem 0;
   text-align: center;
   font-size: 1.8rem;
   color: #fff;
@@ -686,6 +686,7 @@ main,
   color: #052023;
   font-weight: 600;
   cursor: pointer;
+  font-size: 10px;
 }
 
 .add-song-btn:disabled {
