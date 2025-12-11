@@ -22,12 +22,10 @@ prisma.$connect()
   })
 
 // -------------------------------------------------------
-//  DEEZER SEARCH PROXY
-//  Frontend calls:  GET /api/deezer-search?q=Love
-//  This server route calls: https://api.deezer.com/search?q=Love
-//  and returns the JSON to the browser (no CORS issues).
+//  DEEZER SEARCH PROXY - fetch ALL pages for a query
+//  Frontend calls:  GET /api/deezer-search?q=artist:"Taylor Swift"
+//  This route loops through Deezer pages and merges them.
 // -------------------------------------------------------
-
 router.get('/api/deezer-search', async (req, res) => {
   const q = req.query.q
 
@@ -35,25 +33,50 @@ router.get('/api/deezer-search', async (req, res) => {
     return res.status(400).json({ error: 'Missing query parameter q' })
   }
 
+  // Deezer paging: limit = page size, index = offset
+  const PAGE_SIZE = 50
+  // Safety cap: how many tracks max we’ll fetch in total
+  const MAX_TOTAL = 500
+
   try {
-const deezerRes = await fetch(
-  `https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=50`
-)
+    let allTracks = []
+    let index = 0
 
+    while (allTracks.length < MAX_TOTAL) {
+      const url = `https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=${PAGE_SIZE}&index=${index}`
+      console.log('Fetching from Deezer:', url)
 
-    if (!deezerRes.ok) {
-      const text = await deezerRes.text()
-      console.error('Deezer API error:', deezerRes.status, text)
-      return res
-        .status(500)
-        .json({ error: 'Failed to fetch from Deezer', status: deezerRes.status })
+      const deezerRes = await fetch(url)
+
+      if (!deezerRes.ok) {
+        const text = await deezerRes.text()
+        console.error('Deezer API error:', deezerRes.status, text)
+        return res
+          .status(500)
+          .json({ error: 'Failed to fetch from Deezer', status: deezerRes.status })
+      }
+
+      const pageData = await deezerRes.json()
+      const tracks = Array.isArray(pageData.data) ? pageData.data : []
+
+      allTracks = allTracks.concat(tracks)
+
+      // If we got less than PAGE_SIZE, there are no more pages
+      if (tracks.length < PAGE_SIZE) break
+
+      index += PAGE_SIZE
     }
 
-    const data = await deezerRes.json()
-    res.json(data)
+    console.log(`Total tracks fetched from Deezer: ${allTracks.length}`)
+
+    // Keep a Deezer-like shape: { data: [...] }
+    return res.json({ data: allTracks })
   } catch (err) {
     console.error('Deezer proxy error:', err)
-    res.status(500).json({ error: 'Failed to fetch from Deezer', details: err.message || err })
+    return res.status(500).json({
+      error: 'Failed to fetch from Deezer',
+      details: err.message || err
+    })
   }
 })
 
@@ -71,19 +94,21 @@ router.post('/data', async (req, res) => {
     const { id, ...createData } = req.body
 
     // createData now includes songs if the frontend sent it.
-    // Prisma will store it in the `songs Json?` field.
+    // Prisma will store it in the `songs` JSON field.
     const created = await prisma[model].create({
       data: createData
     })
     res.status(201).send(created)
   } catch (err) {
     console.error('POST /data error:', err)
-    res.status(500).send({ error: 'Failed to create record', details: err.message || err })
+    res.status(500).send({
+      error: 'Failed to create record',
+      details: err.message || err
+    })
   }
 })
 
-
-// ----- READ (GET) list ----- 
+// ----- READ (GET) list -----
 router.get('/data', async (req, res) => {
   try {
     // fetch first 100 records from the database with no filter
@@ -93,51 +118,43 @@ router.get('/data', async (req, res) => {
     res.send(result)
   } catch (err) {
     console.error('GET /data error:', err)
-    res.status(500).send({ error: 'Failed to fetch records', details: err.message || err })
+    res.status(500).send({
+      error: 'Failed to fetch records',
+      details: err.message || err
+    })
   }
 })
 
-
-
 // ----- findMany() with search ------- 
-// Accepts optional search parameter to filter by name field
-// See also: https://www.prisma.io/docs/orm/reference/prisma-client-reference#examples-7
+// Accepts optional search parameter to filter by concertName field
 router.get('/search', async (req, res) => {
   try {
-    // get search terms from query string, default to empty string
     const searchTerms = req.query.terms || ''
-    // fetch the records from the database
     const result = await prisma[model].findMany({
       where: {
         concertName: {
           contains: searchTerms,
-          mode: 'insensitive'  // case-insensitive search
+          mode: 'insensitive'
         }
       },
-      // use the correct field name here
       orderBy: { concertName: 'asc' },
       take: 10
     })
     res.send(result)
   } catch (err) {
     console.error('GET /search error:', err)
-    res.status(500).send({ error: 'Search failed', details: err.message || err })
+    res.status(500).send({
+      error: 'Search failed',
+      details: err.message || err
+    })
   }
 })
 
-
 // ----- UPDATE (PUT) -----
-// Listen for PUT requests
-// respond by updating a particular record in the database
-// This is the 'U' of CRUD
-// After updating the database we send the updated record back to the frontend.
 router.put('/data/:id', async (req, res) => {
   try {
-    // Remove the id from the request body if it exists
-    // The id should not be in the data payload for updates
     const { id, ...updateData } = req.body
 
-    // updateData will also include songs if the frontend sends it
     const updated = await prisma[model].update({
       where: { id: req.params.id },
       data: updateData
@@ -145,14 +162,14 @@ router.put('/data/:id', async (req, res) => {
     res.send(updated)
   } catch (err) {
     console.error('PUT /data/:id error:', err)
-    res.status(500).send({ error: 'Failed to update record', details: err.message || err })
+    res.status(500).send({
+      error: 'Failed to update record',
+      details: err.message || err
+    })
   }
 })
 
 // ----- DELETE -----
-// Listen for DELETE requests
-// respond by deleting a particular record in the database
-// This is the 'D' of CRUD
 router.delete('/data/:id', async (req, res) => {
   try {
     const result = await prisma[model].delete({
@@ -161,11 +178,12 @@ router.delete('/data/:id', async (req, res) => {
     res.send(result)
   } catch (err) {
     console.error('DELETE /data/:id error:', err)
-    res.status(500).send({ error: 'Failed to delete record', details: err.message || err })
+    res.status(500).send({
+      error: 'Failed to delete record',
+      details: err.message || err
+    })
   }
 })
 
-
 // export the api routes for use elsewhere in our app 
-// (e.g. in index.js )
 export default router

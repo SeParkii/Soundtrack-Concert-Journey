@@ -44,7 +44,6 @@ const showStep2 = () => {
     step2.hidden = false
     step2.style.display = 'block'
   }
-  // make sure user sees the top of step 2
   if (formPopover) formPopover.scrollTop = 0
 }
 
@@ -80,7 +79,7 @@ const searchSongs = async (query) => {
   songResultsContainer.innerHTML = '<p>Searching...</p>'
 
   try {
-    // Treat the input as an artist name:
+    // Treat user input as ARTIST NAME:
     const advancedQuery = `artist:"${query.trim()}"`
 
     const response = await fetch(
@@ -95,7 +94,7 @@ const searchSongs = async (query) => {
     const data = await response.json()
     const tracks = Array.isArray(data.data) ? data.data : []
 
-    console.log('Artist search returned', tracks.length, 'tracks for', query)
+    console.log('Deezer returned', tracks.length, 'tracks for', query)
     renderSongResults(tracks)
   } catch (err) {
     console.error('Deezer search error:', err)
@@ -109,10 +108,11 @@ const renderSongResults = (tracks) => {
     return
   }
 
-  // show ALL results the API gave us
+  // Show ALL tracks returned by the backend (which already merged all pages)
   const html = tracks.map(track => {
     const isAlreadySelected = selectedSongs.some(s => s.id === track.id)
 
+    // Fix Deezer http:// previews for https sites
     const previewUrl = track.preview
       ? track.preview.replace(/^http:\/\//, 'https://')
       : ''
@@ -144,9 +144,7 @@ const renderSongResults = (tracks) => {
           <button
             type="button"
             class="add-song-btn"
-            data-track='${JSON
-              .stringify(trackData)
-              .replace(/'/g, '&apos;')}'
+            data-track='${JSON.stringify(trackData).replace(/'/g, '&apos;')}'
             ${isAlreadySelected ? 'disabled' : ''}
           >
             ${isAlreadySelected ? 'Added' : 'Add'}
@@ -161,9 +159,7 @@ const renderSongResults = (tracks) => {
   // Wire "Add" buttons
   songResultsContainer.querySelectorAll('.add-song-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const trackData = JSON.parse(
-        btn.dataset.track.replace(/&apos;/g, "'")
-      )
+      const trackData = JSON.parse(btn.dataset.track.replace(/&apos;/g, "'"))
 
       if (!selectedSongs.some(s => s.id === trackData.id)) {
         selectedSongs.push(trackData)
@@ -258,7 +254,6 @@ const saveItem = async (data) => {
 const editItem = (data) => {
   console.log('Editing:', data)
 
-  // Populate form fields
   Object.keys(data).forEach(field => {
     const element = myForm.elements[field]
     if (!element) return
@@ -272,7 +267,6 @@ const editItem = (data) => {
     }
   })
 
-  // Load songs
   selectedSongs = Array.isArray(data.songs) ? data.songs : []
   renderSelectedSongs()
 
@@ -332,7 +326,7 @@ const renderItem = (item) => {
   div.classList.add('item-card')
   div.setAttribute('data-id', item.id)
 
-  // --- Make sure songs is an array ---
+  // Make sure songs is an array
   let songsArray = []
   if (Array.isArray(item.songs)) {
     songsArray = item.songs
