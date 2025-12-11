@@ -144,12 +144,17 @@ header h4 {
   gap: 0.25rem;
 }
 
+/* --------- RIGHT COLUMN IMAGES: 2 PER ROW --------- */
 .top-row-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  justify-items: center;
+  width: 100%;
+  max-width: 500px;   /* keeps images inside card */
 }
+
+
 
 .item-card p {
   margin: 0.18rem 0;
@@ -307,23 +312,22 @@ header h4 {
   padding: 0.35rem 0;
 }
 
-/* ===== CONCERT POSTER IMAGES (up to two) ===== */
+/* ===== CONCERT POSTER IMAGES ===== */
 
 .concert-image {
-  width: 100%;
-  max-width: 260px;
-  flex-shrink: 0;
+  width: 240px;         /* make the image container this wide */
+  height: 240px;        /* make the image container this tall */
   background: rgba(230, 246, 255, 0.4);
-  border-radius: 1.4rem;
+  border-radius: 1.2rem;
   overflow: hidden;
 }
 
 .concert-image img {
-  display: block;
   width: 100%;
-  height: auto;
-  object-fit: cover;
+  height: 100%;
+  object-fit: cover;    /* crop nicely, no distortion */
 }
+
 
 /* Slight visual difference for the second image */
 .secondary-image {
@@ -369,7 +373,7 @@ main,
   border-radius: 999px;
   cursor: pointer;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 13px;
 }
 
 .edit-btn {
@@ -796,13 +800,18 @@ button.cancel:hover {
     padding: 2rem 1.75rem;
   }
 
-  .item-card .top-row {
-    grid-template-columns: 1fr;   /* stack info over images */
-    row-gap: 1.5rem;
-  }
+.item-card .top-row {
+  display: grid;
+  grid-template-columns: 1fr auto; /* left fills space, right stays tight */
+  align-items: flex-start;
+  column-gap: 2rem;
+}
 
+
+  /* On mobile, images in a single column so they don't get too tiny */
   .top-row-right {
-    align-items: center;
+    grid-template-columns: 1fr;
+    justify-items: center;
   }
 
   .concert-image {
