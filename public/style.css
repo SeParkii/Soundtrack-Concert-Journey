@@ -122,6 +122,8 @@ header p {
   border: 1px solid #cde4ed;
   width: 100%;
   position: relative;
+  display: flex;
+    flex-direction: column;
 }
 
 /* Top row: left text + right calendar+image */
@@ -176,7 +178,7 @@ header p {
 }
 
 .item-card h3 {
-  font-size: 1.9rem;
+  font-size: 20px;
   margin: 0 0 0.3rem 0;
   color: #ffffff;
 }
@@ -348,7 +350,7 @@ main,
 ============================= */
 
 .item-actions {
-  margin-top: 1.75rem;
+  margin-top: auto;
   display: flex;
   justify-content: center;
   gap: 1.5rem;
