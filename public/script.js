@@ -326,7 +326,6 @@ const renderItem = (item) => {
   if (Array.isArray(item.songs)) {
     songsArray = item.songs
   } else if (item.songs && typeof item.songs === 'string') {
-    // In case Prisma stored JSON as a string for some reason
     try {
       songsArray = JSON.parse(item.songs)
     } catch (e) {
@@ -334,7 +333,16 @@ const renderItem = (item) => {
     }
   }
 
-  // --- Build the songs section HTML ---
+  // Poster image HTML
+  const imageHtml = item.posterUrl
+    ? `
+      <figure class="concert-image">
+        <img src="${item.posterUrl}" alt="Concert image for ${item.concertName || 'concert'}">
+      </figure>
+    `
+    : ''
+
+  // Songs section HTML
   let songsHtml = ''
   if (songsArray.length > 0) {
     songsHtml = `
@@ -371,51 +379,34 @@ const renderItem = (item) => {
       </div>
     </div>
 
-    <div class="item-info">
-      <div class="item-info-text">
+    <!-- TOP ROW: text on the left, calendar + image on the right -->
+    <div class="top-row">
+      <div class="top-row-left">
         <p><strong>Venue:</strong> ${item.venue || '-'}</p>
         <p><strong>City:</strong> ${item.city || '-'}</p>
+        <p><strong>Ticket Type:</strong> ${item.ticketType || '-'}</p>
+        <p><strong>Price:</strong> ${
+          item.price ? '$' + Number(item.price).toFixed(2) : '-'
+        }</p>
+        <p><strong>Seat:</strong> ${item.seatInfo || '-'}</p>
+        <p><strong>Status:</strong> ${
+          item.concertDate
+            ? new Date(item.concertDate) < new Date()
+              ? 'Past'
+              : 'Upcoming'
+            : '-'
+        }</p>
       </div>
-      ${calendarWidget(item.concertDate)}
-    </div>
 
-
-    <div class="stats">
-      <div class="stat">
-        <span>Ticket Type:</span>
-        <span>${item.ticketType || '-'}</span>
+      <div class="top-row-right">
+        ${calendarWidget(item.concertDate)}
+        ${imageHtml}
       </div>
-      <div class="stat">
-        <span>Price:</span>
-        <span>${item.price ? '$' + Number(item.price).toFixed(2) : '-'}</span>
-      </div>
-    </div>
-
-    <div class="item-info">
-      <p><strong>Seat:</strong> ${item.seatInfo || '-'}</p>
-      <p><strong>Status:</strong> ${
-        item.concertDate
-          ? new Date(item.concertDate) < new Date()
-            ? 'Past'
-            : 'Upcoming'
-          : '-'
-      }</p>
     </div>
 
     <section class="description" style="${item.notes ? '' : 'display:none;'}">
       <p>${item.notes || ''}</p>
     </section>
-
-${
-  item.posterUrl
-    ? `
-      <figure class="concert-image">
-        <img src="${item.posterUrl}" alt="Concert image for ${item.concertName || 'concert'}">
-      </figure>
-    `
-    : ''
-}
-
 
     ${songsHtml}
 
