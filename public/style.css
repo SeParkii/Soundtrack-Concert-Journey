@@ -17,8 +17,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-
-
 /* =============================
    HEADER BAR
 ============================= */
@@ -46,8 +44,6 @@ header p {
   max-width: 75rem; 
   text-align: left; 
 }
-
-
 
 #createButton {
   background: #e6f6ff;
@@ -78,8 +74,6 @@ header p {
   box-shadow: 0 4px 0 rgba(0,0,0,0.03); 
 }
 
-
-
 /* =============================
    STATUS BANNER (MongoDB ready)
 ============================= */
@@ -103,8 +97,6 @@ header p {
   color: #7e0000;
 }
 
-
-
 /* =============================
    CONTENT AREA – 2 COLUMN GRID
 ============================= */
@@ -117,12 +109,21 @@ header p {
   gap: 3rem 3rem;       /* spacing between cards */
 }
 
-
-
 /* =============================
    TICKET CARDS
-   Text left (single flow), calendar pinned right
 ============================= */
+
+.item-card {
+  background: #6ea7b6;
+  color: #ffffff;
+  border-radius: 1.5rem;
+  padding: 2.5rem 3rem;
+  padding-right: 3rem;        /* no huge empty space on right */
+  border: 1px solid #cde4ed;
+  width: 100%;
+  position: relative;
+}
+
 /* Top row: left text + right calendar+image */
 .item-card .top-row {
   display: flex;
@@ -133,40 +134,18 @@ header p {
 }
 
 .top-row-left {
-  flex: 2;
+  flex: 1.3;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
 .top-row-right {
-  flex: 1.2;
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-start;
-}
-
-.top-row-left {
-  flex: 2;
-}
-
-.top-row-right {
-  flex: 1.2;
+  flex: 1.7;                  /* give more space to image+calendar */
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 1rem;
-}
-
-.item-card {
-  background: #6ea7b6;
-  color: #ffffff;
-  border-radius: 1.5rem;
-  padding: 2.5rem 3rem;
-  padding-right: 9rem;          /* room for the calendar on the right */
-  border: 1px solid #cde4ed;
-  width: 100%;
-  position: relative;           /* anchor for absolute calendar */
 }
 
 /* All paragraphs inside the card: smaller gaps */
@@ -175,18 +154,10 @@ header p {
   font-size: 1rem;
 }
 
-
-/* 2. Bold the words "Ticket Type" and "Price" (labels only) */
+/* Bold "Ticket Type" and "Price" labels */
 .item-card .stat span:first-child {
   font-weight: 700;
 }
-
-/* Remove the entire Artist row in the left info column */
-.item-card .left p:first-child {
-  display: none;
-}
-
-
 
 /* Info block (left column text) */
 .item-card .info,
@@ -198,15 +169,14 @@ header p {
 .item-card .item-info {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;  /* top align */
+  align-items: flex-start;
   gap: 2rem;
 }
 
-/* Left side takes the remaining width */
+/* Left side takes remaining width */
 .item-info-text {
   flex: 1;
 }
-
 
 .item-card h3 {
   font-size: 1.9rem;
@@ -223,15 +193,13 @@ header p {
 
 /* Add larger spacing between Status and Notes */
 .item-card .description {
-  margin-top: 2rem;   /* adjust this number */
+  margin-top: 2rem;
 }
 
-
-/* Add spacing between artist name and the info block */
+/* Spacing between artist and info block */
 .item-card .microchip-info {
-  margin-bottom: 2rem;   /* adjust number to your preference */
+  margin-bottom: 2rem;
 }
-
 
 /* ===== SONGS ON TICKET CARD ===== */
 
@@ -292,12 +260,13 @@ header p {
   }
 }
 
+/* ===== CALENDAR ===== */
+
 .item-card .calendar {
   position: static;
   transform: none;
   right: auto;
   top: auto;
-
   width: 6rem;
   display: flex;
   flex-direction: column;
@@ -308,12 +277,10 @@ header p {
   text-align: center;
 }
 
-
 .calendar-inline {
-  margin-top: 1.75rem;   /* pushes it down into the green area */
+  margin-top: 0;  /* calendar sits right above the image */
 }
 
-/* In case calendar appears outside .item-card somehow, keep generic styling */
 .calendar img {
   width: 1.3rem;
   margin: 0.25rem auto;
@@ -345,9 +312,12 @@ header p {
   padding: 0.35rem 0;
 }
 
+/* ===== CONCERT POSTER IMAGE ===== */
+
 .concert-image {
-  width: 100%;
-  max-width: 260px;   /* controls poster size (tweak if you want) */
+  width: 300px;               /* 🔥 bigger fixed width */
+  max-width: 100%;
+  flex-shrink: 0;             /* don't let flexbox squish it */
   background: rgba(230, 246, 255, 0.4);
   border-radius: 1.4rem;
   overflow: hidden;
@@ -359,7 +329,6 @@ header p {
   height: auto;
   object-fit: cover;
 }
-
 
 /* =============================
    PAGE PADDING
@@ -381,8 +350,6 @@ main,
   padding-bottom: 3rem;
   box-sizing: border-box;
 }
-
-
 
 /* =============================
    EDIT + DELETE BUTTONS
@@ -418,8 +385,6 @@ main,
 .edit-btn:hover { background: #f3fbff; }
 .delete-btn:hover { background: #ffcbcd; }
 
-
-
 /* =============================
    FORM PANEL
 ============================= */
@@ -433,9 +398,8 @@ main,
   width: min(1100px, calc(100% - 8rem));
   margin: 2rem auto;
   box-shadow: 0 8px 30px rgba(10,30,40,0.12);
-    max-height: calc(100vh - 4rem);
+  max-height: calc(100vh - 4rem);
   overflow-y: auto;
-
 }
 
 #formPopover::backdrop {
@@ -449,10 +413,8 @@ main,
   color: #fff;
 }
 
-
-
 /* =============================
-   FORM LAYOUT – 4 COLUMN GRID
+   FORM LAYOUT – STEP 1 & STEP 2
 ============================= */
 
 /* Shared style for all form buttons */
@@ -465,7 +427,7 @@ main,
   border: none;
   padding: 0.7rem 1.8rem;
   font-weight: 700;
-  border-radius: 999px; /* pill shape */
+  border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(0,0,0,0.03);
 }
@@ -481,7 +443,7 @@ main,
   display: block;
 }
 
-/* STEP 1: 4-column grid like your pic2 */
+/* STEP 1: 4-column grid */
 #step-1 {
   margin-top: 1.5rem;
   display: grid;
@@ -523,7 +485,7 @@ main,
   min-height: 12rem;
 }
 
-/* STEP 1 buttons row (Next + Cancel) centered at bottom */
+/* STEP 1 buttons row */
 #step-1 fieldset:last-of-type {
   grid-column: 1 / -1;
   display: flex;
@@ -537,13 +499,12 @@ main,
   margin-top: 1.5rem;
 }
 
-/* Center the headings + helper text like pic2 */
+/* Center headings + helper text */
 #step-2 h3,
 #step-2 p {
   text-align: center;
 }
 
-/* Basic field styling */
 #step-2 fieldset {
   border: none;
   margin: 0 0 1rem 0;
@@ -557,16 +518,101 @@ main,
   color: #e6f6ff;
 }
 
-/* SONG RESULTS: 2 per row with its own scroll area */
+/* Search bar + button layout */
+#step-2 fieldset:first-of-type {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+#step-2 fieldset:first-of-type label {
+  grid-column: 1 / -1;
+}
+
+#step-2 fieldset:first-of-type input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: #e6f6ff;
+  color: #052023;
+}
+
+#step-2 fieldset:first-of-type button {
+  background: #e6f6ff;
+  color: #052023;
+  border: none;
+  padding: 0.7rem 1.8rem;
+  font-weight: 700;
+  border-radius: 999px;   /* makes it a pill like your other buttons */
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.03);
+}
+
+#step-2 fieldset:first-of-type button:hover {
+  background: #f3fbff;
+}
+
+
+#step-2 fieldset:first-of-type small {
+  grid-column: 1 / -1;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+/* SONG RESULTS: 2 per row with scroll */
 #songResults {
   margin-top: 1rem;
-  max-height: 320px;                 /* adjust height if you want */
+  max-height: 320px;
   padding-right: 0.5rem;
-  overflow-y: auto;                   /* scroll inside */
+  overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
 }
+
+
+/* Selected songs layout: audio on the left, Remove on the right */
+#selectedSongsList {
+  margin-top: 1rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Each selected song row */
+#selectedSongsList li {
+  display: grid;
+  grid-template-columns: 1fr auto;   /* audio takes all space, button on right */
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Make the audio fill its column */
+#selectedSongsList audio {
+  width: 100%;
+}
+
+/* Style the Remove buttons like Save / Cancel / Skip buttons */
+#selectedSongsList button {
+  background: #e6f6ff;
+  color: #052023;
+  border: none;
+  padding: 0.35rem 1.2rem;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.03);
+  font-size: 0.85rem;
+}
+
+#selectedSongsList button:hover {
+  background: #f3fbff;
+}
+
 
 /* Each song card */
 .song-card {
@@ -578,7 +624,6 @@ main,
   gap: 0.5rem;
 }
 
-/* top row: cover + title/artist */
 .song-main {
   display: flex;
   align-items: center;
@@ -603,7 +648,6 @@ main,
   opacity: 0.9;
 }
 
-/* bottom: audio + Add button */
 .song-actions {
   display: flex;
   flex-direction: column;
@@ -630,64 +674,13 @@ main,
   cursor: default;
 }
 
-/* On small screens, go back to 1 column */
-@media (max-width: 900px) {
-  .item-card .top-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .top-row-right {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .concert-image {
-    max-width: 100%;
-  }
-}
-
-
-
-/* Search bar full width + button to the right */
-#step-2 fieldset:first-of-type {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.6rem;
-  align-items: center;
-}
-
-#step-2 fieldset:first-of-type label {
-  grid-column: 1 / -1;
-}
-
-#step-2 fieldset:first-of-type input {
-  width: 100%;
-  padding: 0.55rem 0.7rem;
-  border: none;
-  border-radius: 0.35rem;
-  background: #e6f6ff;
-  color: #052023;
-}
-
-#step-2 fieldset:first-of-type button {
-  padding: 0.6rem 1.4rem;
-}
-
-/* Small "Powered by Deezer" text */
-#step-2 fieldset:first-of-type small {
-  grid-column: 1 / -1;
-  font-size: 0.8rem;
-  opacity: 0.85;
-}
-
-/* Song results spacing */
+/* Selected songs list */
 #songResults,
 #selectedSongsList {
   margin-top: 1rem;
 }
 
-/* STEP 2 bottom buttons: Skip & Save / Save / Cancel */
+/* STEP 2 bottom buttons */
 #step-2 fieldset:last-of-type {
   display: flex;
   justify-content: center;
@@ -695,7 +688,6 @@ main,
   margin-top: 1.75rem;
 }
 
-/* Make these buttons visually match Step 1 */
 #step-2 fieldset:last-of-type button {
   background: #e6f6ff;
   color: #052023;
@@ -709,6 +701,8 @@ main,
 #step-2 fieldset:last-of-type button:hover {
   background: #f3fbff;
 }
+
+/* Generic form element styles (fallback) */
 
 #myForm fieldset {
   border: none;
@@ -744,13 +738,9 @@ main,
   min-height: 12rem;
 }
 
-/* =============================
-   FORM BUTTONS (SAVE + CANCEL)
-   — full width at the bottom
-============================= */
-
+/* Buttons at very bottom (safety) */
 #myForm fieldset:last-of-type {
-  grid-column: 1 / -1;           /* span all 4 columns */
+  grid-column: 1 / -1;
   display: flex;
   justify-content: center;
   gap: 2.5rem;
@@ -773,10 +763,6 @@ button.cancel:hover {
   background: #f3fbff;
 }
 
-
-
-
-
 /* =============================
    RESPONSIVE
 ============================= */
@@ -793,23 +779,32 @@ button.cancel:hover {
     grid-template-columns: 1fr;
   }
 
-  /* small screens: let calendar drop into normal flow */
   .item-card {
     padding-right: 3rem;
   }
 
-  .item-card .calendar {
-    position: static;
-    transform: none;
-    margin-top: 1rem;
+  .item-card .top-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  #myForm {
-    grid-template-columns: 1fr;
+  .top-row-right {
+    width: 100%;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .concert-image {
+    width: 100%;
+    max-width: 100%;
   }
 
   #formPopover {
     width: calc(100% - 2rem);
     padding: 1.5rem;
+  }
+
+  #step-1 {
+    grid-template-columns: 1fr;
   }
 }
