@@ -106,7 +106,7 @@ header h4 {
 
 #contentArea {
   width: calc(100% - 12rem);
-  max-width: 1100px;           /* so cards don’t stretch too wide */
+  max-width: 1000px;           /* a bit narrower so card doesn’t stretch too wide */
   margin: 3rem auto;
   display: grid;
   grid-template-columns: 1fr;  /* one card per row */
@@ -133,9 +133,10 @@ header h4 {
 /* Top row: left info + right images */
 .item-card .top-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr);
+  /* LEFT column slightly narrower, RIGHT column only as wide as the images */
+  grid-template-columns: minmax(0, 1.3fr) auto;
   align-items: flex-start;
-  column-gap: 2rem;        /* space between text and images */
+  column-gap: 1.5rem;        /* smaller gap between text and images */
 }
 
 .top-row-left {
@@ -147,14 +148,11 @@ header h4 {
 /* --------- RIGHT COLUMN IMAGES: 2 PER ROW --------- */
 .top-row-right {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  justify-items: center;
-  width: 100%;
-  max-width: 500px;   /* keeps images inside card */
+  grid-template-columns: repeat(2, auto);
+  gap: 1rem;
+  justify-content: flex-start;    /* keep images close to text */
+  width: max-content;             /* do NOT stretch full column width */
 }
-
-
 
 .item-card p {
   margin: 0.18rem 0;
@@ -315,8 +313,8 @@ header h4 {
 /* ===== CONCERT POSTER IMAGES ===== */
 
 .concert-image {
-  width: 240px;         /* make the image container this wide */
-  height: 240px;        /* make the image container this tall */
+  width: 240px;         /* image container size */
+  height: 240px;
   background: rgba(230, 246, 255, 0.4);
   border-radius: 1.2rem;
   overflow: hidden;
@@ -327,7 +325,6 @@ header h4 {
   height: 100%;
   object-fit: cover;    /* crop nicely, no distortion */
 }
-
 
 /* Slight visual difference for the second image */
 .secondary-image {
@@ -433,6 +430,7 @@ main,
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(0,0,0,0.03);
+  font-size: 13px;
 }
 
 .form-btn:hover,
@@ -530,6 +528,7 @@ main,
   border-radius: 0.35rem;
   background: #e6f6ff;
   color: #052023;
+  font-size: 13px;
 }
 
 #step-2 fieldset:first-of-type button {
@@ -541,6 +540,7 @@ main,
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(0,0,0,0.03);
+  font-size: 13px;
 }
 
 #step-2 fieldset:first-of-type button:hover {
@@ -619,12 +619,13 @@ main,
   border-radius: 999px;
   cursor: pointer;
   box-shadow: 0 4px 0 rgba(0,0,0,0.03);
-  font-size: 0.95rem;
+  font-size: 13px;
   height: 2.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
+
 }
 
 #selectedSongsList button:hover {
@@ -793,20 +794,19 @@ button.cancel:hover {
   #contentArea {
     width: calc(100% - 3rem);
     max-width: 100%;
-    grid-template-columns: 1fr;   /* still one per row on small screens */
+    grid-template-columns: 1fr;
   }
 
   .item-card {
     padding: 2rem 1.75rem;
   }
 
-.item-card .top-row {
-  display: grid;
-  grid-template-columns: 1fr auto; /* left fills space, right stays tight */
-  align-items: flex-start;
-  column-gap: 2rem;
-}
-
+  .item-card .top-row {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) auto;
+    column-gap: 1rem;         
+    align-items: flex-start;
+  }
 
   /* On mobile, images in a single column so they don't get too tiny */
   .top-row-right {
@@ -827,4 +827,20 @@ button.cancel:hover {
   #step-1 {
     grid-template-columns: 1fr;
   }
+}
+
+#formPopover {
+  font-size: 13px;   /* ← change this value to whatever you like */
+}
+
+#formPopover h2 {
+  font-size: 1.6rem;    /* title size */
+}
+
+#formPopover label {
+  font-size: 13px;   /* field labels */
+}
+
+#formPopover small {
+  font-size: 10px;   /* helper text under fields */
 }
