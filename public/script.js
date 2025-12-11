@@ -27,7 +27,7 @@ let selectedSongs = []
 const showStep1 = () => {
   if (step1) {
     step1.hidden = false
-    step1.style.display = 'grid'   // keep grid layout
+    step1.style.display = 'grid' // keep grid layout
   }
   if (step2) {
     step2.hidden = true
@@ -47,9 +47,6 @@ const showStep2 = () => {
   // make sure user sees the top of step 2
   if (formPopover) formPopover.scrollTop = 0
 }
-
-
-
 
 // ---------- FORM DATA HELPER ----------
 const getFormData = () => {
@@ -71,8 +68,7 @@ const getFormData = () => {
   })
 
   // Attach songs to payload
-  json.songs = selectedSongs   // remove or comment this line
-
+  json.songs = selectedSongs
 
   return json
 }
@@ -84,8 +80,12 @@ const searchSongs = async (query) => {
   songResultsContainer.innerHTML = '<p>Searching...</p>'
 
   try {
-    // This calls your backend proxy route (must exist on server)
-    const response = await fetch(`/api/deezer-search?q=${encodeURIComponent(query)}`)
+    // Treat the input as an artist name:
+    const advancedQuery = `artist:"${query.trim()}"`
+
+    const response = await fetch(
+      `/api/deezer-search?q=${encodeURIComponent(advancedQuery)}`
+    )
 
     if (!response.ok) {
       songResultsContainer.innerHTML = '<p><i>Song search failed.</i></p>'
@@ -94,6 +94,8 @@ const searchSongs = async (query) => {
 
     const data = await response.json()
     const tracks = Array.isArray(data.data) ? data.data : []
+
+    console.log('Artist search returned', tracks.length, 'tracks for', query)
     renderSongResults(tracks)
   } catch (err) {
     console.error('Deezer search error:', err)
@@ -107,22 +109,22 @@ const renderSongResults = (tracks) => {
     return
   }
 
-  const html = tracks.slice(0, 10).map(track => {
+  // show ALL results the API gave us
+  const html = tracks.map(track => {
     const isAlreadySelected = selectedSongs.some(s => s.id === track.id)
 
-const previewUrl = track.preview
-  ? track.preview.replace(/^http:\/\//, 'https://')
-  : ''
+    const previewUrl = track.preview
+      ? track.preview.replace(/^http:\/\//, 'https://')
+      : ''
 
-const trackData = {
-  id: track.id,
-  title: track.title,
-  artist: track.artist?.name || '',
-  album: track.album?.title || '',
-  cover: track.album?.cover_small || '',
-  preview: previewUrl
-}
-
+    const trackData = {
+      id: track.id,
+      title: track.title,
+      artist: track.artist?.name || '',
+      album: track.album?.title || '',
+      cover: track.album?.cover_small || '',
+      preview: previewUrl
+    }
 
     return `
       <article class="song-card">
@@ -142,7 +144,9 @@ const trackData = {
           <button
             type="button"
             class="add-song-btn"
-            data-track='${JSON.stringify(trackData).replace(/'/g, '&apos;')}'
+            data-track='${JSON
+              .stringify(trackData)
+              .replace(/'/g, '&apos;')}'
             ${isAlreadySelected ? 'disabled' : ''}
           >
             ${isAlreadySelected ? 'Added' : 'Add'}
@@ -157,7 +161,9 @@ const trackData = {
   // Wire "Add" buttons
   songResultsContainer.querySelectorAll('.add-song-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const trackData = JSON.parse(btn.dataset.track.replace(/&apos;/g, "'"))
+      const trackData = JSON.parse(
+        btn.dataset.track.replace(/&apos;/g, "'")
+      )
 
       if (!selectedSongs.some(s => s.id === trackData.id)) {
         selectedSongs.push(trackData)
@@ -180,12 +186,11 @@ const renderSelectedSongs = () => {
   const html = selectedSongs.map(song => `
     <div class="selected-song" data-id="${song.id}">
       <span>${song.title} – ${song.artist}</span>
-${
-  song.preview
-    ? `<audio controls src="${song.preview.replace(/^http:\/\//, 'https://')}"></audio>`
-    : ''
-}
-
+      ${
+        song.preview
+          ? `<audio controls src="${song.preview.replace(/^http:\/\//, 'https://')}"></audio>`
+          : ''
+      }
       <button type="button" class="remove-song-btn">Remove</button>
     </div>
   `).join('')
@@ -212,7 +217,7 @@ const saveItem = async (data) => {
   const options = {
     method,
     headers: {
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(data)
@@ -227,15 +232,12 @@ const saveItem = async (data) => {
 
       try {
         errorData = await response.json()
-        // Prefer detailed message if available
         errorText = errorData.details || errorData.error || errorText
       } catch (e) {
         // ignore JSON parse error
       }
 
       console.error('Save error (full):', errorData || errorText)
-
-      // Show full info in the alert so we can see Prisma’s exact error
       alert(
         'Failed to save:\n' +
         (errorData ? JSON.stringify(errorData, null, 2) : errorText)
@@ -251,7 +253,6 @@ const saveItem = async (data) => {
     alert('An error occurred while saving')
   }
 }
-
 
 // ---------- EDIT ----------
 const editItem = (data) => {
@@ -360,29 +361,26 @@ const renderItem = (item) => {
         <h4>Songs from this concert</h4>
         <ul class="songs-list">
           ${songsArray
-            .map(
-              (song) => `
-            <li class="song-item">
-              <div class="song-meta">
-                <strong>${song.title || 'Unknown title'}</strong>
-                <span class="song-artist"> – ${song.artist || 'Unknown artist'}</span>
-              </div>
-${
-  song.preview
-    ? `<audio controls src="${song.preview.replace(/^http:\/\//, 'https://')}"></audio>`
-    : `<span class="no-preview"><i>No preview available</i></span>`
-}
-
-            </li>
-          `
-            )
+            .map(song => `
+              <li class="song-item">
+                <div class="song-meta">
+                  <strong>${song.title || 'Unknown title'}</strong>
+                  <span class="song-artist"> – ${song.artist || 'Unknown artist'}</span>
+                </div>
+                ${
+                  song.preview
+                    ? `<audio controls src="${song.preview.replace(/^http:\/\//, 'https://')}"></audio>`
+                    : `<span class="no-preview"><i>No preview available</i></span>`
+                }
+              </li>
+            `)
             .join('')}
         </ul>
       </section>
     `
   }
 
-    const template = /*html*/`
+  const template = /* html */`
     <div class="item-heading">
       <h3>${item.concertName || 'Untitled Concert'}</h3>
       <div class="microchip-info">
@@ -390,7 +388,6 @@ ${
       </div>
     </div>
 
-    <!-- TOP ROW: left = details + calendar, right = poster image -->
     <div class="top-row">
       <div class="top-row-left">
         <p><strong>Venue:</strong> ${item.venue || '-'}</p>
@@ -408,13 +405,11 @@ ${
             : '-'
         }</p>
 
-        <!-- calendar moved to the left column (green box) -->
         <div class="calendar-inline">
           ${calendarWidget(item.concertDate)}
         </div>
       </div>
 
-      <!-- right column = only the image now (red box) -->
       <div class="top-row-right">
         ${imageHtml}
       </div>
@@ -439,7 +434,6 @@ ${
 
   return div
 }
-
 
 // ---------- POPOVER FALLBACKS ----------
 if (formPopover) {
@@ -489,7 +483,6 @@ myForm.addEventListener('submit', async (event) => {
 // ---------- SKIP SONGS (OPTIONAL STEP) ----------
 if (skipSongsBtn) {
   skipSongsBtn.addEventListener('click', () => {
-    // Submit the form with current data (songs may be empty)
     myForm.requestSubmit()
   })
 }

@@ -36,9 +36,10 @@ router.get('/api/deezer-search', async (req, res) => {
   }
 
   try {
-    const deezerRes = await fetch(
-      `https://api.deezer.com/search?q=${encodeURIComponent(q)}`
-    )
+const deezerRes = await fetch(
+  `https://api.deezer.com/search?q=${encodeURIComponent(q)}&limit=50`
+)
+
 
     if (!deezerRes.ok) {
       const text = await deezerRes.text()
