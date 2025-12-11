@@ -110,14 +110,19 @@ const renderSongResults = (tracks) => {
   const html = tracks.slice(0, 10).map(track => {
     const isAlreadySelected = selectedSongs.some(s => s.id === track.id)
 
-    const trackData = {
-      id: track.id,
-      title: track.title,
-      artist: track.artist?.name || '',
-      album: track.album?.title || '',
-      cover: track.album?.cover_small || '',
-      preview: track.preview || ''
-    }
+const previewUrl = track.preview
+  ? track.preview.replace(/^http:\/\//, 'https://')
+  : ''
+
+const trackData = {
+  id: track.id,
+  title: track.title,
+  artist: track.artist?.name || '',
+  album: track.album?.title || '',
+  cover: track.album?.cover_small || '',
+  preview: previewUrl
+}
+
 
     return `
       <article class="song-card">
@@ -175,7 +180,12 @@ const renderSelectedSongs = () => {
   const html = selectedSongs.map(song => `
     <div class="selected-song" data-id="${song.id}">
       <span>${song.title} – ${song.artist}</span>
-      ${song.preview ? `<audio controls src="${song.preview}"></audio>` : ''}
+${
+  song.preview
+    ? `<audio controls src="${song.preview.replace(/^http:\/\//, 'https://')}"></audio>`
+    : ''
+}
+
       <button type="button" class="remove-song-btn">Remove</button>
     </div>
   `).join('')
@@ -357,11 +367,12 @@ const renderItem = (item) => {
                 <strong>${song.title || 'Unknown title'}</strong>
                 <span class="song-artist"> – ${song.artist || 'Unknown artist'}</span>
               </div>
-              ${
-                song.preview
-                  ? `<audio controls src="${song.preview}"></audio>`
-                  : `<span class="no-preview"><i>No preview available</i></span>`
-              }
+${
+  song.preview
+    ? `<audio controls src="${song.preview.replace(/^http:\/\//, 'https://')}"></audio>`
+    : `<span class="no-preview"><i>No preview available</i></span>`
+}
+
             </li>
           `
             )
